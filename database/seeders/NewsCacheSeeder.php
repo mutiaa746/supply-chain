@@ -2,16 +2,33 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Country;
+use App\Models\NewsCache;
 
 class NewsCacheSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        foreach (Country::all() as $country) {
+
+            NewsCache::updateOrCreate(
+                [
+                    'country_id'=>$country->id,
+                ],
+                [
+                    'title'=>'Supply Chain Update '.$country->country_name,
+                    'source'=>'NewsAPI',
+                    'url'=>'https://example.com/news/'.$country->country_code,
+                    'sentiment'=>collect([
+                        'positive',
+                        'neutral',
+                        'negative'
+                    ])->random(),
+                    'published_at'=>now(),
+                ]
+            );
+
+        }
     }
 }

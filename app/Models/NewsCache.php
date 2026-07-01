@@ -1,9 +1,27 @@
-public function country()
-{
-    return $this->belongsTo(Country::class);
-}
+<?php
 
-public function sentimentResults()
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class NewsCache extends Model
 {
-    return $this->hasMany(SentimentResult::class);
+    protected $fillable = [
+        'country_id',
+        'title',
+        'source',
+        'url',
+        'sentiment',
+        'published_at'
+    ];
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function sentimentResults()
+    {
+        return $this->hasMany(SentimentResult::class);
+    }
 }

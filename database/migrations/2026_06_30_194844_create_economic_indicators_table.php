@@ -6,32 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
-{
-    Schema::create('economic_indicators', function (Blueprint $table) {
-        $table->id();
+    {
+        Schema::create('economic_indicators', function (Blueprint $table) {
+            $table->id();
 
-        $table->foreignId('country_id')
-              ->constrained('countries')
-              ->cascadeOnDelete();
+            $table->foreignId('country_id')
+                  ->constrained('countries')
+                  ->onDelete('cascade');
 
-        $table->year('year');
+            $table->decimal('gdp', 15, 2)->nullable();
+            $table->decimal('inflation_rate', 5, 2)->nullable();
+            $table->decimal('interest_rate', 5, 2)->nullable();
+            $table->decimal('unemployment_rate', 5, 2)->nullable();
 
-        $table->decimal('gdp', 20, 2)->nullable();
-        $table->decimal('inflation', 8, 2)->nullable();
-        $table->bigInteger('population')->nullable();
-        $table->decimal('exports', 20, 2)->nullable();
-        $table->decimal('imports', 20, 2)->nullable();
+            $table->timestamps();
+        });
+    }
 
-        $table->timestamps();
-    });
-}
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('economic_indicators');
