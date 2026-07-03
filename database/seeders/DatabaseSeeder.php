@@ -1,25 +1,14 @@
-<?php
-
-namespace Database\Seeders;
-
-use Illuminate\Database\Seeder;
-
-class DatabaseSeeder extends Seeder
+public function run(): void
 {
-    /**
-     * Seed the application's database.
-     */
-    public function run(): void
-    {
-        $this->call([
-            CountrySeeder::class,
-            EconomicIndicatorSeeder::class,
-            WeatherDataSeeder::class,
-            ExchangeRateSeeder::class,
-            PortSeeder::class,
-            NewsCacheSeeder::class,
-            PositiveWordSeeder::class,
-            NegativeWordSeeder::class,
-        ]);
-    }
+    $this->call([
+        CountrySeeder::class,
+        EconomicIndicatorSeeder::class,
+        WeatherDataSeeder::class,
+        ExchangeRateSeeder::class,
+        PortSeeder::class,
+        NewsCacheSeeder::class,
+        PositiveWordSeeder::class,
+        NegativeWordSeeder::class,
+        RiskScoreSeeder::class,
+    ]);
 }

@@ -10,9 +10,14 @@ class WeatherData extends Model
     protected $fillable = [
         'country_id',
         'temperature',
-        'humidity',
+        'rainfall',
         'wind_speed',
-        'weather_condition',
+        'storm_risk',
+        'recorded_at',
+    ];
+
+    protected $casts = [
+        'recorded_at' => 'datetime',
     ];
 
     public function country(): BelongsTo

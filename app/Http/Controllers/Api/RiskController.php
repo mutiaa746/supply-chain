@@ -1,11 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Models;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class RiskController extends Controller
+class RiskScore extends Model
 {
-    //
+    protected $fillable = [
+        'country_id',
+        'weather_score',
+        'inflation_score',
+        'currency_score',
+        'news_score',
+        'total_score',
+        'risk_level',
+    ];
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
 }

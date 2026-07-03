@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\WeatherData;
+use App\Models\RiskScore;
 
-class WeatherController extends Controller
+class RiskScoreController extends Controller
 {
     public function index()
     {
         return response()->json(
-            WeatherData::with('country')->get()
+            RiskScore::with('country')->get()
         );
     }
 }
