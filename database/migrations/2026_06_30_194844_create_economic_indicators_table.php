@@ -12,13 +12,14 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('country_id')
-                  ->constrained('countries')
-                  ->onDelete('cascade');
+                ->constrained('countries')
+                ->cascadeOnDelete();
 
-            $table->decimal('gdp', 15, 2)->nullable();
-            $table->decimal('inflation_rate', 5, 2)->nullable();
-            $table->decimal('interest_rate', 5, 2)->nullable();
-            $table->decimal('unemployment_rate', 5, 2)->nullable();
+            $table->decimal('gdp', 20, 2)->nullable();
+            $table->decimal('inflation', 8, 2)->nullable();
+            $table->bigInteger('population')->nullable();
+            $table->decimal('exports', 20, 2)->nullable();
+            $table->decimal('imports', 20, 2)->nullable();
 
             $table->timestamps();
         });

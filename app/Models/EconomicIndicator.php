@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EconomicIndicator extends Model
 {
     protected $fillable = [
         'country_id',
-        'year',
         'gdp',
         'inflation',
         'population',
@@ -16,7 +16,7 @@ class EconomicIndicator extends Model
         'imports'
     ];
 
-    public function country()
+    public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
     }
