@@ -3,17 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RiskScore extends Model
 {
     protected $fillable = [
         'country_id',
-        'score',
-        'risk_level',
+        'weather_score',
+        'inflation_score',
+        'currency_score',
+        'news_score',
+        'total_score',
+        'risk_level'
     ];
 
-    public function country(): BelongsTo
+    public function country()
     {
         return $this->belongsTo(Country::class);
     }
