@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Port extends Model
 {
@@ -15,17 +14,10 @@ class Port extends Model
         'longitude',
         'harbor_size',
         'harbor_type',
-        'status',
-        'delay_hours',
+        'status'
     ];
 
-    protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float',
-        'delay_hours' => 'float',
-    ];
-
-    public function country(): BelongsTo
+    public function country()
     {
         return $this->belongsTo(Country::class);
     }

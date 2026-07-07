@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WeatherData extends Model
 {
@@ -13,14 +12,10 @@ class WeatherData extends Model
         'rainfall',
         'wind_speed',
         'storm_risk',
-        'recorded_at',
+        'recorded_at'
     ];
 
-    protected $casts = [
-        'recorded_at' => 'datetime',
-    ];
-
-    public function country(): BelongsTo
+    public function country()
     {
         return $this->belongsTo(Country::class);
     }
