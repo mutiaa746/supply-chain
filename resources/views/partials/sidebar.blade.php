@@ -1,69 +1,129 @@
-<div class="col-md-2 bg-light vh-100 border-end">
+<div class="col-md-2 col-lg-2 d-md-block bg-dark sidebar min-vh-100 p-0">
 
-    <div class="pt-3">
+    <div class="text-center py-4 border-bottom border-secondary">
 
-        <h5 class="text-center mb-4">
-            Menu
+        <i class="bi bi-globe2 text-info" style="font-size:55px;"></i>
+
+        <h5 class="text-white mt-2 mb-0">
+
+            SCRMS
+
         </h5>
 
-        <ul class="nav flex-column">
+        <small class="text-secondary">
 
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/') }}">
-                    Dashboard
-                </a>
-            </li>
+            Monitoring System
 
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/countries') }}">
-                    Countries
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/weather') }}">
-                    Weather
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/economic') }}">
-                    Economic Indicator
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/exchange') }}">
-                    Exchange Rate
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/news') }}">
-                    News
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/ports') }}">
-                    Ports
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('ports.map') }}">
-                    🗺 Port Map
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/risk') }}">
-                    Risk Score
-                </a>
-            </li>
-
-        </ul>
+        </small>
 
     </div>
+
+    <ul class="nav flex-column mt-3">
+
+        <li class="nav-item">
+
+            <a href="/"
+               class="nav-link text-white">
+
+                <i class="bi bi-speedometer2 me-2"></i>
+
+                Dashboard
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/countries"
+               class="nav-link text-white">
+
+                <i class="bi bi-globe-americas me-2"></i>
+
+                Countries
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/weather"
+               class="nav-link text-white">
+
+                <i class="bi bi-cloud-sun me-2"></i>
+
+                Weather
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/economic"
+               class="nav-link text-white">
+
+                <i class="bi bi-bar-chart-line me-2"></i>
+
+                Economic
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/exchange"
+               class="nav-link text-white">
+
+                <i class="bi bi-cash-stack me-2"></i>
+
+                Exchange Rate
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/news"
+               class="nav-link text-white">
+
+                <i class="bi bi-newspaper me-2"></i>
+
+                News
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/ports"
+               class="nav-link text-white">
+
+                <i class="bi bi-geo-alt me-2"></i>
+
+                Ports
+
+            </a>
+
+        </li>
+
+        <li class="nav-item">
+
+            <a href="/risk"
+               class="nav-link text-white">
+
+                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                Risk Score
+
+            </a>
+
+        </li>
+
+    </ul>
 
 </div>

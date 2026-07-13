@@ -2,102 +2,132 @@
 
 namespace App\Services;
 
-use App\Models\Country;
 use App\Models\NewsCache;
+use App\Models\SentimentWord;
+use App\Models\Country;
 use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class NewsService
 {
-    public function sync(): bool
+    public function fetchNews($countryCode, $query = null)
     {
-        $apiKey = env('GNEWS_API_KEY');
-
-        if (!$apiKey) {
-            throw new \Exception('GNEWS_API_KEY belum diatur di file .env');
+        try {
+            $apiKey = env('GNEWS_API_KEY', '');
+            
+            if (empty($apiKey)) {
+                return $this->getDummyNews($countryCode);
+            }
+            
+            $searchQuery = $query ?? "logistics trade shipping economy {$countryCode}";
+            
+            $response = Http::timeout(10)->get("https://gnews.io/api/v4/search", [
+                'q' => $searchQuery,
+                'token' => $apiKey,
+                'lang' => 'en',
+                'max' => 10,
+                'country' => $countryCode
+            ]);
+            
+            if (!$response->successful()) {
+                return $this->getDummyNews($countryCode);
+            }
+            
+            $data = $response->json();
+            
+            if (!isset($data['articles']) || !is_array($data['articles'])) {
+                return $this->getDummyNews($countryCode);
+            }
+            
+            // Cari country_id
+            $country = Country::where('country_code', $countryCode)->first();
+            $countryId = $country ? $country->id : null;
+            
+            foreach ($data['articles'] as $article) {
+                $text = ($article['description'] ?? $article['title'] ?? '');
+                $sentiment = $this->analyzeSentiment($text);
+                
+                NewsCache::updateOrCreate(
+                    ['url' => $article['url'] ?? ''],
+                    [
+                        'country_id' => $countryId,
+                        'country_code' => $countryCode,
+                        'title' => $article['title'] ?? 'No Title',
+                        'description' => $article['description'] ?? '',
+                        'source' => $article['source']['name'] ?? 'Unknown',
+                        'published_at' => $article['publishedAt'] ?? now(),
+                        'sentiment' => $sentiment['sentiment'],
+                        'sentiment_score' => $sentiment['score']
+                    ]
+                );
+            }
+            
+            return $data;
+            
+        } catch (\Exception $e) {
+            return $this->getDummyNews($countryCode);
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Negara yang dipantau
-        |--------------------------------------------------------------------------
-        | Mengikuti studi kasus Supply Chain.
-        | Tidak mengambil 250 negara karena GNews Free memiliki limit request.
-        |--------------------------------------------------------------------------
-        */
-        $countries = Country::whereIn('country_name', [
-            'Indonesia',
-            'China',
-            'United States',
-            'Japan',
-            'Germany',
-            'Singapore',
-            'Malaysia',
-            'Australia',
-            'India',
-            'South Korea',
-        ])->get();
-
-        foreach ($countries as $country) {
-
-            $this->syncCountryNews($country, $apiKey);
-
-            // Menghindari rate limit
-            usleep(500000);
-        }
-
-        return true;
     }
-
-    private function syncCountryNews(Country $country, string $apiKey): void
+    
+    public function getDummyNews($countryCode)
     {
-        $query = sprintf(
-            '"%s" AND (economy OR logistics OR shipping OR trade)',
-            $country->country_name
-        );
-
-        $response = Http::timeout(60)
-            ->retry(3, 1000)
-            ->get(
-                'https://gnews.io/api/v4/search',
+        return [
+            'articles' => [
                 [
-                    'q' => $query,
-                    'lang' => 'en',
-                    'max' => 5,
-                    'sortby' => 'publishedAt',
-                    'apikey' => $apiKey,
-                ]
-            );
-
-        if (!$response->successful()) {
-
-            echo "Gagal mengambil berita {$country->country_name}\n";
-
-            return;
-        }
-
-        $articles = $response->json()['articles'] ?? [];
-
-        foreach ($articles as $article) {
-
-            NewsCache::updateOrCreate(
-
-                [
-                    'url' => $article['url']
+                    'title' => "Trade Update for {$countryCode}",
+                    'description' => "Trade activities show stable growth in the region.",
+                    'source' => ['name' => 'Trade News'],
+                    'publishedAt' => now()->toISOString(),
+                    'url' => '#'
                 ],
-
                 [
-                    'country_id' => $country->id,
-                    'title' => $article['title'] ?? '',
-                    'source' => $article['source']['name'] ?? 'Unknown',
-                    'sentiment' => null,
-                    'published_at' => isset($article['publishedAt'])
-    ? Carbon::parse($article['publishedAt'])
-    : now(),
+                    'title' => "Economic Outlook for {$countryCode}",
+                    'description' => "Economic indicators remain positive with steady inflation.",
+                    'source' => ['name' => 'Economic Times'],
+                    'publishedAt' => now()->toISOString(),
+                    'url' => '#'
+                ],
+                [
+                    'title' => "Logistics Update for {$countryCode}",
+                    'description' => "Logistics sector shows improvement in supply chain efficiency.",
+                    'source' => ['name' => 'Logistics Today'],
+                    'publishedAt' => now()->toISOString(),
+                    'url' => '#'
                 ]
-            );
+            ]
+        ];
+    }
+    
+    public function analyzeSentiment($text)
+    {
+        $positiveWords = SentimentWord::where('type', 'positive')->pluck('word')->toArray();
+        $negativeWords = SentimentWord::where('type', 'negative')->pluck('word')->toArray();
+        
+        $text = strtolower($text);
+        $words = str_word_count($text, 1);
+        
+        $positiveCount = 0;
+        $negativeCount = 0;
+        
+        foreach ($words as $word) {
+            if (in_array($word, $positiveWords)) $positiveCount++;
+            if (in_array($word, $negativeWords)) $negativeCount++;
         }
-
-        echo "✓ {$country->country_name} : " . count($articles) . " berita\n";
+        
+        $total = $positiveCount + $negativeCount;
+        
+        if ($total === 0) {
+            return ['sentiment' => 'neutral', 'score' => 0];
+        }
+        
+        $score = ($positiveCount - $negativeCount) / $total;
+        
+        if ($score > 0.2) {
+            return ['sentiment' => 'positive', 'score' => $score];
+        } elseif ($score < -0.2) {
+            return ['sentiment' => 'negative', 'score' => $score];
+        } else {
+            return ['sentiment' => 'neutral', 'score' => $score];
+        }
     }
 }

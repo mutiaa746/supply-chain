@@ -6,15 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExchangeRate extends Model
 {
-    protected $fillable = [
-        'country_id',
-        'currency',
-        'exchange_rate',
-        'recorded_at'
-    ];
-
-    public function country()
-    {
-        return $this->belongsTo(Country::class);
-    }
+    protected $fillable = ['base_currency', 'target_currency', 'rate'];
 }

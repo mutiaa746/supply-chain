@@ -6,36 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-   public function up(): void
-{
-    Schema::create('risk_scores', function (Blueprint $table) {
-        $table->id();
+    public function up(): void
+    {
+        Schema::create('risk_scores', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('country_id')->constrained()->onDelete('cascade');
+            $table->decimal('weather_score', 5, 2)->default(0);
+            $table->decimal('inflation_score', 5, 2)->default(0);
+            $table->decimal('currency_score', 5, 2)->default(0);
+            $table->decimal('news_score', 5, 2)->default(0);
+            $table->decimal('total_score', 5, 2)->default(0);
+            $table->enum('risk_level', ['Low', 'Medium', 'High', 'Critical'])->default('Low');
+            $table->timestamp('calculated_at')->nullable();
+            $table->timestamps();
+        });
+    }
 
-        $table->foreignId('country_id')
-              ->constrained('countries')
-              ->cascadeOnDelete();
-
-        $table->integer('weather_score')->default(0);
-        $table->integer('inflation_score')->default(0);
-        $table->integer('currency_score')->default(0);
-        $table->integer('news_score')->default(0);
-        $table->integer('total_score')->default(0);
-
-        $table->enum('risk_level', [
-            'Low',
-            'Medium',
-            'High'
-        ]);
-
-        $table->timestamps();
-    });
-}
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('risk_scores');

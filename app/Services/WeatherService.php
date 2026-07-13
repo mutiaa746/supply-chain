@@ -2,110 +2,66 @@
 
 namespace App\Services;
 
-use App\Models\Country;
-use App\Models\WeatherData;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WeatherService
 {
-    public function sync(): bool
+    public function getWeather($latitude, $longitude)
     {
-        $countries = Country::whereNotNull('capital')->get();
+        try {
+            $response = Http::timeout(10)->get("https://api.open-meteo.com/v1/forecast", [
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'current_weather' => true,
+                'timezone' => 'auto'
+            ]);
 
-        foreach ($countries as $country) {
-
-            try {
-
-                echo "Memproses : {$country->country_name}\n";
-
-                // ==========================
-                // Ambil koordinat ibu kota
-                // ==========================
-                $geo = Http::timeout(30)
-                    ->retry(3, 1000)
-                    ->get(
-                        'https://geocoding-api.open-meteo.com/v1/search',
-                        [
-                            'name' => $country->capital,
-                            'count' => 1,
-                            'language' => 'en',
-                            'format' => 'json'
-                        ]
-                    );
-
-                if (!$geo->successful()) {
-                    echo "❌ Geocoding gagal\n";
-                    continue;
-                }
-
-                $geoData = $geo->json();
-
-                if (!isset($geoData['results'][0])) {
-                    echo "❌ Koordinat tidak ditemukan\n";
-                    continue;
-                }
-
-                $latitude = $geoData['results'][0]['latitude'];
-                $longitude = $geoData['results'][0]['longitude'];
-
-                // ==========================
-                // Ambil data cuaca
-                // ==========================
-                $weather = Http::timeout(30)
-                    ->retry(3, 1000)
-                    ->get(
-                        'https://api.open-meteo.com/v1/forecast',
-                        [
-                            'latitude' => $latitude,
-                            'longitude' => $longitude,
-                            'current' => 'temperature_2m,precipitation,wind_speed_10m,weather_code'
-                        ]
-                    );
-
-                if (!$weather->successful()) {
-                    echo "❌ Weather API gagal\n";
-                    continue;
-                }
-
-                $current = $weather->json('current');
-
-                WeatherData::updateOrCreate(
-                    [
-                        'country_id' => $country->id,
-                    ],
-                    [
-                        'temperature' => $current['temperature_2m'] ?? null,
-                        'rainfall' => $current['precipitation'] ?? null,
-                        'wind_speed' => $current['wind_speed_10m'] ?? null,
-                        'storm_risk' => $this->stormRisk($current['weather_code'] ?? 0),
-                        'recorded_at' => $current['time'] ?? now(),
-                    ]
-                );
-
-                echo "✅ Berhasil\n\n";
-
-            } catch (\Throwable $e) {
-
-                echo "❌ ERROR : {$country->country_name}\n";
-                echo $e->getMessage()."\n\n";
-
-                continue;
+            if ($response->successful()) {
+                return $response->json();
             }
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Weather API Error: ' . $e->getMessage());
+            return null;
         }
-
-        return true;
     }
 
-    private function stormRisk($code): string
+    public static function getWeatherDescription($code)
     {
-        if (in_array($code, [95, 96, 99])) {
-            return 'High';
-        }
+        $weatherCodes = [
+            0 => 'Cerah',
+            1 => 'Cerah Berawan',
+            2 => 'Berawan',
+            3 => 'Mendung',
+            45 => 'Kabut',
+            48 => 'Kabut Es',
+            51 => 'Gerimis Ringan',
+            53 => 'Gerimis Sedang',
+            55 => 'Gerimis Lebat',
+            61 => 'Hujan Ringan',
+            63 => 'Hujan Sedang',
+            65 => 'Hujan Lebat',
+            71 => 'Salju Ringan',
+            73 => 'Salju Sedang',
+            75 => 'Salju Lebat',
+            80 => 'Hujan Ringan',
+            81 => 'Hujan Sedang',
+            82 => 'Hujan Lebat',
+            95 => 'Badai Petir',
+            96 => 'Badai Petir + Hujan Es',
+            99 => 'Badai Petir + Hujan Es Lebat'
+        ];
+        return $weatherCodes[$code] ?? 'Tidak Diketahui';
+    }
 
-        if (in_array($code, [61, 63, 65, 80, 81, 82])) {
-            return 'Medium';
-        }
-
+    public function getWeatherRiskLevel($code)
+    {
+        $highRisk = [65, 75, 82, 95, 96, 99];
+        $mediumRisk = [53, 55, 63, 71, 73, 80, 81];
+        
+        if (in_array($code, $highRisk)) return 'High';
+        if (in_array($code, $mediumRisk)) return 'Medium';
         return 'Low';
     }
 }

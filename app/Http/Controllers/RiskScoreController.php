@@ -2,31 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\RiskScore;
+use App\Services\RiskScoreService;
+use App\Services\WeatherService;
+use App\Services\CurrencyService;
+use App\Services\NewsService;
+use Illuminate\Http\Request;
 
 class RiskScoreController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $search = $request->search;
-
         $riskScores = RiskScore::with('country')
-
-            ->when($search, function ($query) use ($search) {
-
-                $query->whereHas('country', function ($q) use ($search) {
-
-                    $q->where('country_name', 'like', "%{$search}%");
-
-                });
-
-            })
-
-            ->orderByDesc('total_score')
-
-            ->paginate(10);
-
-        return view('risk.index', compact('riskScores', 'search'));
+            ->orderBy('total_score', 'desc')
+            ->get();
+        
+        $highRisk = RiskScore::where('risk_level', 'High')->orWhere('risk_level', 'Critical')->count();
+        $mediumRisk = RiskScore::where('risk_level', 'Medium')->count();
+        $lowRisk = RiskScore::where('risk_level', 'Low')->count();
+        
+        return view('risk.index', compact('riskScores', 'highRisk', 'mediumRisk', 'lowRisk'));
     }
 }

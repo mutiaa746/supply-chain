@@ -1,114 +1,50 @@
 @extends('layouts.app')
 
+@section('title', 'Economic Indicators')
+
 @section('content')
-
-<h2 class="mb-4">
-
-    Economic Indicator
-
-</h2>
-
-<div class="card shadow">
-
-    <div class="card-body">
-
-        <form action="{{ url('/economic') }}" method="GET">
-
-            <div class="row mb-3">
-
-                <div class="col-md-4">
-
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        placeholder="Search Country..."
-                        value="{{ $search }}">
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <button class="btn btn-primary w-100">
-
-                        Search
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-        <table class="table table-bordered table-hover">
-
-            <thead class="table-dark">
-
-                <tr>
-
-                    <th>No</th>
-
-                    <th>Country</th>
-
-                    <th>GDP</th>
-
-                    <th>Inflation</th>
-
-                    <th>Population</th>
-
-                    <th>Exports</th>
-
-                    <th>Imports</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-            @forelse($economics as $item)
-
-                <tr>
-
-                    <td>{{ $economics->firstItem() + $loop->index }}</td>
-
-                    <td>{{ $item->country->country_name }}</td>
-
-                    <td>{{ number_format($item->gdp,2) }}</td>
-
-                    <td>{{ $item->inflation }} %</td>
-
-                    <td>{{ number_format($item->population) }}</td>
-
-                    <td>{{ number_format($item->exports,2) }}</td>
-
-                    <td>{{ number_format($item->imports,2) }}</td>
-
-                </tr>
-
-            @empty
-
-                <tr>
-
-                    <td colspan="7" class="text-center">
-
-                        No Data
-
-                    </td>
-
-                </tr>
-
-            @endforelse
-
-            </tbody>
-
-        </table>
-
-        {{ $economics->withQueryString()->links() }}
-
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">📈 Economic Indicators</h1>
     </div>
-
 </div>
 
+<div class="row">
+    @forelse($countries as $country)
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>
+                    @if($country->flag)
+                        <img src="{{ $country->flag }}" width="24" height="16">
+                    @endif
+                    {{ $country->country_name }}
+                </h5>
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td>GDP</td>
+                        <td><strong>${{ number_format($country->gdp ?? 0, 2) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Inflation</td>
+                        <td><strong>{{ $country->inflation ?? 0 }}%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Population</td>
+                        <td><strong>{{ number_format($country->population ?? 0) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Currency</td>
+                        <td><strong>{{ $country->currency ?? '-' }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="col-md-12">
+        <div class="alert alert-warning">No economic data available. Please run <a href="/test/countries">/test/countries</a>.</div>
+    </div>
+    @endforelse
+</div>
 @endsection

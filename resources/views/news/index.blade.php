@@ -1,127 +1,65 @@
 @extends('layouts.app')
 
+@section('title', 'News')
+
 @section('content')
-
-<h2 class="mb-4">
-    News Monitoring
-</h2>
-
-<div class="card shadow">
-
-    <div class="card-body">
-
-        <form action="{{ url('/news') }}" method="GET">
-
-            <div class="row mb-3">
-
-                <div class="col-md-4">
-
-                    <input
-                        type="text"
-                        class="form-control"
-                        name="search"
-                        value="{{ $search }}"
-                        placeholder="Search Country...">
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <button class="btn btn-primary w-100">
-                        Search
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-        <table class="table table-bordered table-hover">
-
-            <thead class="table-dark">
-
-                <tr>
-
-                    <th>No</th>
-                    <th>Country</th>
-                    <th>Title</th>
-                    <th>Source</th>
-                    <th>Sentiment</th>
-                    <th>Published</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-            @forelse($news as $item)
-
-                <tr>
-
-                    <td>{{ $news->firstItem() + $loop->index }}</td>
-
-                    <td>{{ $item->country->country_name }}</td>
-
-                    <td>
-                        <a href="{{ $item->url }}" target="_blank">
-                            {{ $item->title }}
-                        </a>
-                    </td>
-
-                    <td>{{ $item->source }}</td>
-
-                    <td>
-
-                        @if($item->sentiment=="positive")
-
-                            <span class="badge bg-success">
-                                Positive
-                            </span>
-
-                        @elseif($item->sentiment=="negative")
-
-                            <span class="badge bg-danger">
-                                Negative
-                            </span>
-
-                        @else
-
-                            <span class="badge bg-secondary">
-                                Neutral
-                            </span>
-
-                        @endif
-
-                    </td>
-
-                    <td>{{ $item->published_at }}</td>
-
-                </tr>
-
-            @empty
-
-                <tr>
-
-                    <td colspan="6" class="text-center">
-
-                        No News Found
-
-                    </td>
-
-                </tr>
-
-            @endforelse
-
-            </tbody>
-
-        </table>
-
-        {{ $news->withQueryString()->links() }}
-
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">📰 News Intelligence</h1>
     </div>
-
 </div>
 
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form method="GET" class="d-flex">
+            <select name="country" class="form-select me-2">
+                @foreach($countries as $c)
+                    <option value="{{ $c->country_code }}" {{ $countryCode == $c->country_code ? 'selected' : '' }}>
+                        {{ $c->country_name }}
+                    </option>
+                @endforeach
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="/news/fetch/{{ $countryCode }}" class="btn btn-success">🔄 Fetch Latest News</a>
+    </div>
+</div>
+
+<div class="row">
+    @forelse($news as $item)
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ $item->title }}</h5>
+                <p class="card-text">{{ Str::limit($item->description ?? 'No description', 200) }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        @php
+                            $sentiment = $item->sentiment ?? 'neutral';
+                            $color = $sentiment == 'positive' ? 'success' : ($sentiment == 'negative' ? 'danger' : 'secondary');
+                        @endphp
+                        <span class="badge bg-{{ $color }}">
+                            {{ ucfirst($sentiment) }}
+                        </span>
+                        <span class="text-muted small ms-2">{{ $item->source ?? 'Unknown' }}</span>
+                    </div>
+                    <small class="text-muted">{{ $item->published_at ? $item->published_at->format('d M Y H:i') : '-' }}</small>
+                </div>
+                @if($item->url && $item->url != '#')
+                    <a href="{{ $item->url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">Read More</a>
+                @endif
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="col-md-12">
+        <div class="alert alert-warning">
+            No news found for {{ $countryCode }}. 
+            <a href="/news/fetch/{{ $countryCode }}" class="btn btn-sm btn-primary ms-2">Fetch News</a>
+        </div>
+    </div>
+    @endforelse
+</div>
 @endsection

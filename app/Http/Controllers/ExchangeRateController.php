@@ -2,31 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\ExchangeRate;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ExchangeRateController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $search = $request->search;
-
-        $exchangeRates = ExchangeRate::with('country')
-
-            ->when($search, function ($query) use ($search) {
-
-                $query->whereHas('country', function ($q) use ($search) {
-
-                    $q->where('country_name', 'like', "%{$search}%");
-
-                });
-
-            })
-
-            ->orderByDesc('id')
-
-            ->paginate(10);
-
-        return view('exchange.index', compact('exchangeRates', 'search'));
+        // Fetch dari API
+        $this->fetchRates();
+        
+        // Ambil data
+        $rates = ExchangeRate::where('base_currency', 'USD')
+            ->orderBy('target_currency')
+            ->get();
+        
+        // Data untuk grafik (10 mata uang utama)
+        $mainCurrencies = ['IDR', 'EUR', 'GBP', 'JPY', 'CNY', 'SGD', 'MYR', 'PHP', 'THB', 'VND'];
+        $chartRates = ExchangeRate::where('base_currency', 'USD')
+            ->whereIn('target_currency', $mainCurrencies)
+            ->get();
+        
+        return view('exchange.index', compact('rates', 'chartRates', 'mainCurrencies'));
+    }
+    
+    public function fetchRates()
+    {
+        try {
+            $response = Http::timeout(10)->get('https://api.exchangerate-api.com/v4/latest/USD');
+            
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                if (isset($data['rates'])) {
+                    foreach ($data['rates'] as $currency => $rate) {
+                        ExchangeRate::updateOrCreate(
+                            ['base_currency' => 'USD', 'target_currency' => $currency],
+                            ['rate' => $rate]
+                        );
+                    }
+                    return true;
+                }
+            }
+            return false;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

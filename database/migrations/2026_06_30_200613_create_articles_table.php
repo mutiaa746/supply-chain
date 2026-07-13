@@ -6,23 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-   public function up(): void
-{
-    Schema::create('articles', function (Blueprint $table) {
-        $table->id();
-        $table->string('title');
-        $table->text('content');
-        $table->string('author');
-        $table->string('image')->nullable();
-        $table->timestamps();
-    });
-}
-    /**
-     * Reverse the migrations.
-     */
+    public function up(): void
+    {
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('slug')->nullable();
+            $table->text('content');
+            $table->foreignId('country_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('category')->nullable();
+            $table->string('author');
+            $table->string('image')->nullable();
+            $table->boolean('is_published')->default(true);
+            $table->timestamps();
+        });
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('articles');

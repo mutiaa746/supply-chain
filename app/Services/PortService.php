@@ -2,61 +2,40 @@
 
 namespace App\Services;
 
-use App\Models\Country;
 use App\Models\Port;
+use App\Models\Country;
 
 class PortService
 {
-    public function import()
+    public function searchPorts($query)
     {
-        $file = storage_path('app/ports/UpdatedPub150.csv');
+        return Port::where('port_name', 'LIKE', "%{$query}%")
+            ->orWhere('country_name', 'LIKE', "%{$query}%")
+            ->with('country')
+            ->get();
+    }
 
-        if (!file_exists($file)) {
-            throw new \Exception("File CSV tidak ditemukan.");
+    public function getPortsByCountry($countryCode)
+    {
+        $country = Country::where('country_code', $countryCode)->first();
+
+        if (!$country) {
+            return collect();
         }
 
-        $handle = fopen($file, 'r');
+        return Port::where('country_id', $country->id)->get();
+    }
 
-        $header = fgetcsv($handle);
+    public function getAllPorts()
+    {
+        return Port::with('country')->get();
+    }
 
-        while (($row = fgetcsv($handle)) !== false) {
-
-            if (count($header) != count($row)) {
-                continue;
-            }
-
-            $data = array_combine($header, $row);
-
-            $countryName = trim($data['Country Code']);
-
-            $country = Country::whereRaw(
-                'LOWER(country_name) = ?',
-                [strtolower($countryName)]
-            )->first();
-
-            // Jika negara tidak ditemukan, lewati saja
-            if (!$country) {
-                continue;
-            }
-
-            Port::updateOrCreate(
-
-                [
-                    'port_name' => trim($data['Main Port Name']),
-                    'country_id' => $country->id,
-                ],
-
-                [
-                    'country_name' => $countryName,
-                    'latitude' => !empty($data['Latitude']) ? $data['Latitude'] : null,
-                    'longitude' => !empty($data['Longitude']) ? $data['Longitude'] : null,
-                    'harbor_size' => !empty($data['Harbor Size']) ? $data['Harbor Size'] : null,
-                    'harbor_type' => !empty($data['Harbor Type']) ? $data['Harbor Type'] : null,
-                    'status' => 'Active',
-                ]
-            );
-        }
-
-        fclose($handle);
+    public function getPortsWithCoordinates()
+    {
+        return Port::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->with('country')
+            ->get();
     }
 }
