@@ -10,15 +10,12 @@ class EconomicIndicatorController extends Controller
 {
     public function index()
     {
-        // Ambil semua countries
         $countries = Country::select('id', 'country_name', 'country_code', 'flag', 'gdp', 'inflation', 'population', 'currency')
             ->orderBy('country_name')
             ->get();
         
-        // Jika tidak ada data GDP/Inflation, ambil dari World Bank
         if ($countries->whereNotNull('gdp')->isEmpty()) {
             $this->fetchWorldBankData();
-            // Refresh data
             $countries = Country::select('id', 'country_name', 'country_code', 'flag', 'gdp', 'inflation', 'population', 'currency')
                 ->orderBy('country_name')
                 ->get();
@@ -33,7 +30,6 @@ class EconomicIndicatorController extends Controller
         
         foreach ($targetCountries as $code) {
             try {
-                // GDP
                 $gdpResponse = Http::timeout(10)->get("http://api.worldbank.org/v2/country/{$code}/indicator/NY.GDP.MKTP.CD?format=json");
                 $gdp = null;
                 if ($gdpResponse->successful()) {
@@ -48,7 +44,6 @@ class EconomicIndicatorController extends Controller
                     }
                 }
                 
-                // Inflation
                 $inflation = null;
                 $inflationResponse = Http::timeout(10)->get("http://api.worldbank.org/v2/country/{$code}/indicator/FP.CPI.TOTL.ZG?format=json");
                 if ($inflationResponse->successful()) {
@@ -63,7 +58,6 @@ class EconomicIndicatorController extends Controller
                     }
                 }
                 
-                // Update database
                 $country = Country::where('country_code', $code)->first();
                 if ($country) {
                     if ($gdp) $country->gdp = $gdp;
@@ -72,7 +66,6 @@ class EconomicIndicatorController extends Controller
                 }
                 
             } catch (\Exception $e) {
-                // Skip jika error
                 continue;
             }
         }

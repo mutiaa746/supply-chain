@@ -10,7 +10,8 @@ class WeatherService
     public function getWeather($latitude, $longitude)
     {
         try {
-            $response = Http::timeout(10)->get("https://api.open-meteo.com/v1/forecast", [
+            // Timeout 3 detik agar cepat
+            $response = Http::timeout(3)->get("https://api.open-meteo.com/v1/forecast", [
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'current_weather' => true,
@@ -53,15 +54,5 @@ class WeatherService
             99 => 'Badai Petir + Hujan Es Lebat'
         ];
         return $weatherCodes[$code] ?? 'Tidak Diketahui';
-    }
-
-    public function getWeatherRiskLevel($code)
-    {
-        $highRisk = [65, 75, 82, 95, 96, 99];
-        $mediumRisk = [53, 55, 63, 71, 73, 80, 81];
-        
-        if (in_array($code, $highRisk)) return 'High';
-        if (in_array($code, $mediumRisk)) return 'Medium';
-        return 'Low';
     }
 }

@@ -6,9 +6,11 @@
 <div class="row">
     <div class="col-md-12">
         <h1 class="mb-4">⚠️ Risk Scoring Dashboard</h1>
+        <p class="text-muted">Total: <strong>{{ $riskScores->count() }}</strong> countries</p>
     </div>
 </div>
 
+<!-- Statistik -->
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card text-white bg-danger">
@@ -36,11 +38,28 @@
     </div>
 </div>
 
+<!-- SEARCH -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form method="GET" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" 
+                   placeholder="Cari negara..." value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Cari
+            </button>
+            <a href="{{ route('risk') }}" class="btn btn-secondary ms-2">
+                <i class="fas fa-undo"></i> Reset
+            </a>
+        </form>
+    </div>
+</div>
+
+<!-- TABEL -->
 <div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5>📋 Risk Scores by Country</h5>
+                <h5 class="mb-0">📋 Risk Scores by Country</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -59,24 +78,32 @@
                         <tbody>
                             @forelse($riskScores as $risk)
                             <tr>
-                                <td>{{ $risk->country->country_name ?? 'Unknown' }}</td>
+                                <td>
+                                    @if($risk->country && $risk->country->flag)
+                                        <img src="{{ $risk->country->flag }}" width="20" height="13" class="me-1">
+                                    @endif
+                                    <strong>{{ $risk->country->country_name ?? 'Unknown' }}</strong>
+                                </td>
                                 <td>{{ $risk->weather_score }}</td>
                                 <td>{{ $risk->inflation_score }}</td>
                                 <td>{{ $risk->currency_score }}</td>
                                 <td>{{ $risk->news_score }}</td>
-                                <td><strong>{{ $risk->total_score }}</strong></td>
                                 <td>
-                                    <span class="badge bg-{{ $risk->risk_level == 'Critical' ? 'danger' : ($risk->risk_level == 'High' ? 'warning' : ($risk->risk_level == 'Medium' ? 'info' : 'success')) }}">
-                                        {{ $risk->risk_level }}
-                                    </span>
+                                    <strong class="text-{{ $risk->total_score >= 70 ? 'danger' : ($risk->total_score >= 50 ? 'warning' : 'success') }}">
+                                        {{ $risk->total_score }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    @php
+                                        $lvl = $risk->risk_level ?? 'Low';
+                                        $clr = $lvl == 'Critical' ? 'danger' : ($lvl == 'High' ? 'warning' : ($lvl == 'Medium' ? 'info' : 'success'));
+                                    @endphp
+                                    <span class="badge bg-{{ $clr }} fs-6 px-3 py-2">{{ $lvl }}</span>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="text-center">
-                                    No risk data. 
-                                    <a href="/test/risk/all" class="btn btn-sm btn-primary ms-2">Calculate All</a>
-                                </td>
+                                <td colspan="7" class="text-center py-4 text-muted">No risk data available.</td>
                             </tr>
                             @endforelse
                         </tbody>

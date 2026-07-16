@@ -10,20 +10,30 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\RiskScoreController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\Auth\LoginController;
 
-/*
-|--------------------------------------------------------------------------
-| ROUTE UTAMA
-|--------------------------------------------------------------------------
-*/
+Route::get('/', function () {
+    if (auth()->check()) {
+        if (auth()->user()->email == 'admin@example.com') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
+})->name('home');
 
-Route::get('/', [DashboardController::class, 'index'])->name('home');
+Route::get('/login', function () {
+    return redirect()->route('login.user');
+})->name('login');
 
-/*
-|--------------------------------------------------------------------------
-| ROUTE ADMIN (MEMERLUKAN LOGIN)
-|--------------------------------------------------------------------------
-*/
+Route::get('/login/user', [LoginController::class, 'showUserLoginForm'])->name('login.user');
+Route::get('/login/admin', [LoginController::class, 'showAdminLoginForm'])->name('login.admin');
+
+Route::post('/login/user', [LoginController::class, 'loginUser'])->name('login.user.post');
+Route::post('/login/admin', [LoginController::class, 'loginAdmin'])->name('login.admin.post');
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -31,111 +41,65 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/countries/{id}', [CountryController::class, 'show'])->name('countries.show');
     Route::get('/weather', [WeatherController::class, 'index'])->name('weather');
     Route::get('/economic', [EconomicIndicatorController::class, 'index'])->name('economic');
+    
+    // EXCHANGE
     Route::get('/exchange', [ExchangeRateController::class, 'index'])->name('exchange');
-    Route::get('/news', [NewsController::class, 'index'])->name('news');
+    Route::get('/exchange/fetch', [ExchangeRateController::class, 'fetchRates'])->name('exchange.fetch');
+    Route::get('/currency', [ExchangeRateController::class, 'index'])->name('currency');
+    Route::get('/currency/fetch', [ExchangeRateController::class, 'fetchRates'])->name('currency.fetch');
+    
+    // NEWS
+    Route::get('/news', [App\Http\Controllers\NewsController::class, 'index'])->name('news');
+    Route::get('/news/fetch/{country}', [App\Http\Controllers\NewsController::class, 'fetch'])->name('news.fetch');    
+    // PORTS
     Route::get('/ports', [PortController::class, 'index'])->name('ports');
     Route::get('/ports/map', [PortController::class, 'map'])->name('ports.map');
+    
+    // RISK
     Route::get('/risk', [RiskScoreController::class, 'index'])->name('risk');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-/*
-|--------------------------------------------------------------------------
-| ROUTE TESTING
-|--------------------------------------------------------------------------
-*/
-
-use App\Services\CountryService;
-use App\Services\WeatherService;
-use App\Services\CurrencyService;
-use App\Services\NewsService;
-use App\Services\RiskScoreService;
-use App\Services\PortService;
-
-Route::get('/test/countries', function () {
-    $service = new CountryService();
-    return response()->json($service->fetchAndUpdateCountries());
-});
-
-Route::get('/test/risk/all', function () {
-    $service = new RiskScoreService(
-        new WeatherService(),
-        new CurrencyService(),
-        new NewsService()
-    );
-    return response()->json($service->calculateAllRisks());
-});
-
-Route::get('/test/currency/{from}/{to}', function ($from, $to) {
-    $service = new CurrencyService();
-    return response()->json(['rate' => $service->getExchangeRate($from, $to)]);
-});
-
-Route::get('/test/news/{code}', function ($code) {
-    $service = new NewsService();
-    return response()->json($service->fetchNews($code));
-});
-Route::get('/fetch-all', function () {
-    $countryService = new \App\Services\CountryService();
-    $currencyService = new \App\Services\CurrencyService();
-    $newsService = new \App\Services\NewsService();
-    $riskService = new \App\Services\RiskScoreService(
-        new \App\Services\WeatherService(),
-        new \App\Services\CurrencyService(),
-        new \App\Services\NewsService()
-    );
     
-    $results = [];
-
-    $results['countries'] = $countryService->fetchAndUpdateCountries();
+    // TRACKING
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
+    Route::post('/tracking/search', [TrackingController::class, 'search'])->name('tracking.search');
     
-
-    $currencyService->fetchExchangeRates('USD');
-    $results['exchange'] = 'Exchange rates updated';
- 
-    $countries = \App\Models\Country::limit(5)->get();
-    foreach ($countries as $country) {
-        $newsService->fetchNews($country->country_code);
-    }
-    $results['news'] = 'News fetched for ' . $countries->count() . ' countries';
-
-    $riskService->calculateAllRisks();
-    $results['risk'] = 'Risk calculated for all countries';
+    // COMPARE
+    Route::get('/compare', function () {
+        $countries = \App\Models\Country::all();
+        return view('compare.index', compact('countries'));
+    })->name('compare');
     
-    return response()->json([
-        'success' => true,
-        'message' => 'All data fetched successfully!',
-        'results' => $results
-    ]);
+    Route::get('/compare/result', function (\Illuminate\Http\Request $request) {
+        $country1 = \App\Models\Country::with('riskScores')->find($request->country1);
+        $country2 = \App\Models\Country::with('riskScores')->find($request->country2);
+        return view('compare.result', compact('country1', 'country2'));
+    })->name('compare.result');
+    
+    // WATCHLIST
+    Route::get('/watchlist', function () {
+        return view('watchlist.index');
+    })->name('watchlist');
+    
+    // VISUALIZATION
+    Route::get('/visualization', function () {
+        return view('visualization.index');
+    })->name('visualization');
+    
+    // PROFILE
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
     Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin.dashboard');
-    
-    // Users
-    Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('admin.users');
-    Route::get('/users/create', [App\Http\Controllers\AdminController::class, 'usersCreate'])->name('admin.users.create');
-    Route::post('/users', [App\Http\Controllers\AdminController::class, 'usersStore'])->name('admin.users.store');
-    Route::get('/users/{id}/edit', [App\Http\Controllers\AdminController::class, 'usersEdit'])->name('admin.users.edit');
-    Route::put('/users/{id}', [App\Http\Controllers\AdminController::class, 'usersUpdate'])->name('admin.users.update');
-    Route::delete('/users/{id}', [App\Http\Controllers\AdminController::class, 'usersDelete'])->name('admin.users.delete');
-    
-    // Ports
-    Route::get('/ports', [App\Http\Controllers\AdminController::class, 'ports'])->name('admin.ports');
-    Route::get('/ports/create', [App\Http\Controllers\AdminController::class, 'portsCreate'])->name('admin.ports.create');
-    Route::post('/ports', [App\Http\Controllers\AdminController::class, 'portsStore'])->name('admin.ports.store');
-    Route::get('/ports/{id}/edit', [App\Http\Controllers\AdminController::class, 'portsEdit'])->name('admin.ports.edit');
-    Route::put('/ports/{id}', [App\Http\Controllers\AdminController::class, 'portsUpdate'])->name('admin.ports.update');
-    Route::delete('/ports/{id}', [App\Http\Controllers\AdminController::class, 'portsDelete'])->name('admin.ports.delete');
-    
-
-    Route::get('/articles', [App\Http\Controllers\AdminController::class, 'articles'])->name('admin.articles');
-    Route::get('/articles/create', [App\Http\Controllers\AdminController::class, 'articlesCreate'])->name('admin.articles.create');
-    Route::post('/articles', [App\Http\Controllers\AdminController::class, 'articlesStore'])->name('admin.articles.store');
-    Route::get('/articles/{id}/edit', [App\Http\Controllers\AdminController::class, 'articlesEdit'])->name('admin.articles.edit');
-    Route::put('/articles/{id}', [App\Http\Controllers\AdminController::class, 'articlesUpdate'])->name('admin.articles.update');
-    Route::delete('/articles/{id}', [App\Http\Controllers\AdminController::class, 'articlesDelete'])->name('admin.articles.delete');
 });
-require __DIR__.'/auth.php';
+
+
+Route::get('/test/risk/all', function () {
+    $service = new \App\Services\RiskScoreService(
+        new \App\Services\WeatherService(),
+        new \App\Services\CurrencyService(),
+        new \App\Services\NewsService()
+    );
+    return response()->json($service->calculateAllRisks());
+});
