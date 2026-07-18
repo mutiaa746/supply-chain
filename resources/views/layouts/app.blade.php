@@ -169,10 +169,11 @@
     </a>
     <a class="nav-link {{ request()->routeIs('risk') ? 'active' : '' }}" href="{{ route('risk') }}">
         <i class="fas fa-exclamation-triangle"></i> Risk
-    </a>
-    <a class="nav-link {{ request()->routeIs('tracking') ? 'active' : '' }}" href="{{ route('tracking') }}">
-        <i class="fas fa-box"></i> Tracking
-    </a>
+    <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('route-simulation*') ? 'active' : '' }}" href="{{ route('route-simulation') }}">
+            <i class="fas fa-route"></i> Route Simulation
+        </a>
+    </li>
     <a class="nav-link {{ request()->routeIs('compare') ? 'active' : '' }}" href="{{ route('compare') }}">
         <i class="fas fa-arrows-left-right"></i> Compare
     </a>

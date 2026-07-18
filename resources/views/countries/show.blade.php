@@ -14,6 +14,28 @@
             {{ $country->country_name }}
             <small class="text-muted">({{ $country->country_code }})</small>
         </h1>
+
+        <!-- ========== TAMBAHKAN INI ========== -->
+        <!-- TOMBOL WATCHLIST -->
+        @auth
+        <div class="mb-3">
+            @php
+                $isWatched = \App\Models\Watchlist::where('user_id', Auth::id())
+                    ->where('country_id', $country->id)
+                    ->exists();
+            @endphp
+            <form action="{{ route('watchlist.toggle') }}" method="POST" style="display:inline;">
+                @csrf
+                <input type="hidden" name="country_id" value="{{ $country->id }}">
+                <button type="submit" class="btn {{ $isWatched ? 'btn-danger' : 'btn-warning' }}">
+                    <i class="fas fa-star"></i>
+                    {{ $isWatched ? ' Hapus dari Pantauan' : ' Tambah ke Pantauan' }}
+                </button>
+            </form>
+        </div>
+        @endauth
+        <!-- ========== SAMPAI SINI ========== -->
+
     </div>
 </div>
 

@@ -6,28 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
- public function up(): void
-{
-    Schema::create('weather_data', function (Blueprint $table) {
-        $table->id();
+    public function up(): void
+    {
+        Schema::create('weather_data', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('country_id')->constrained()->onDelete('cascade');
+            $table->decimal('temperature', 5, 2)->default(0);
+            $table->decimal('wind_speed', 5, 2)->default(0);
+            $table->decimal('rain', 5, 2)->default(0);
+            $table->decimal('humidity', 5, 2)->default(0);
+            $table->integer('weathercode')->default(0);
+            $table->string('description')->nullable();
+            $table->string('storm_risk')->nullable();
+            $table->timestamps();
+        });
+    }
 
-        $table->foreignId('country_id')->constrained()->cascadeOnDelete();
-
-        $table->decimal('temperature',8,2)->nullable();
-        $table->decimal('rainfall',8,2)->nullable();
-        $table->decimal('wind_speed',8,2)->nullable();
-        $table->string('storm_risk')->nullable();
-        $table->timestamp('recorded_at')->nullable();
-
-        $table->timestamps();
-    });
-}
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('weather_data');

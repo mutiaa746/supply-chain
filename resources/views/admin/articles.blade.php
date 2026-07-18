@@ -7,6 +7,9 @@
     <div class="col-md-12">
         <h1 class="mb-4">📰 Manage Articles</h1>
         <a href="/admin/articles/create" class="btn btn-primary mb-3">+ Add Article</a>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
     </div>
 </div>
 
@@ -17,13 +20,7 @@
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
+                            <tr><th>ID</th><th>Title</th><th>Author</th><th>Created</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @foreach($articles as $article)
@@ -35,9 +32,8 @@
                                 <td>
                                     <a href="/admin/articles/{{ $article->id }}/edit" class="btn btn-warning btn-sm">Edit</a>
                                     <form action="/admin/articles/{{ $article->id }}" method="POST" style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this article?')">Delete</button>
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</button>
                                     </form>
                                 </td>
                             </tr>

@@ -4,103 +4,133 @@ namespace App\Services;
 
 use App\Models\Country;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class CountryService
 {
-    public function fetchAndUpdateCountries()
+    /**
+     * Ambil data populasi, GDP, dan inflasi dari REST Countries API
+     */
+    public function updateCountryData()
     {
         try {
             $response = Http::timeout(30)->get('https://restcountries.com/v3.1/all');
             
             if (!$response->successful()) {
-                return ['success' => false, 'message' => 'Gagal mengambil data dari API. Status: ' . $response->status()];
+                return ['success' => false, 'message' => 'Gagal mengambil data dari API'];
             }
-            
+
             $countries = $response->json();
-            
-            if (!is_array($countries) || empty($countries)) {
-                return ['success' => false, 'message' => 'Data API kosong atau tidak valid'];
-            }
-            
-            $count = 0;
-            $errors = [];
-            
-            foreach ($countries as $index => $data) {
-                try {
-                    // Debug: log data pertama
-                    if ($index === 0) {
-                        Log::info('Sample country data:', ['data' => $data]);
-                    }
-                    
-                    // Cek apakah data memiliki field yang diperlukan
-                    if (!isset($data['cca2'])) {
-                        $errors[] = "No cca2 at index $index";
-                        continue;
-                    }
-                    
-                    if (!isset($data['name']) || !isset($data['name']['common'])) {
-                        $errors[] = "No name at index $index";
-                        continue;
-                    }
-                    
-                    $countryCode = $data['cca2'];
-                    
-                    // Cari atau buat baru
-                    $country = Country::where('country_code', $countryCode)->first();
-                    
-                    if (!$country) {
-                        $country = new Country();
-                        $country->country_code = $countryCode;
-                    }
-                    
-                    // Isi data
-                    $country->country_name = $data['name']['common'] ?? 'Unknown';
-                    $country->capital = isset($data['capital'][0]) ? $data['capital'][0] : null;
-                    $country->region = $data['region'] ?? null;
-                    
-                    // Currency
-                    if (isset($data['currencies']) && is_array($data['currencies'])) {
-                        $currencyKeys = array_keys($data['currencies']);
-                        $country->currency = implode(', ', $currencyKeys);
-                        $country->currency_code = $currencyKeys[0] ?? null;
-                    }
-                    
-                    // Language
-                    if (isset($data['languages']) && is_array($data['languages'])) {
-                        $country->language = implode(', ', array_values($data['languages']));
-                    }
-                    
-                    $country->flag = $data['flags']['svg'] ?? null;
-                    $country->population = $data['population'] ?? null;
-                    $country->latitude = isset($data['latlng'][0]) ? $data['latlng'][0] : null;
-                    $country->longitude = isset($data['latlng'][1]) ? $data['latlng'][1] : null;
-                    
-                    $country->save();
-                    $count++;
-                    
-                } catch (\Exception $e) {
-                    $errors[] = "Error at index $index: " . $e->getMessage();
-                    continue;
+            $updated = 0;
+
+            foreach ($countries as $data) {
+                $code = $data['cca2'] ?? null;
+                if (!$code) continue;
+
+                $country = Country::where('country_code', $code)->first();
+                if (!$country) continue;
+
+                // Update populasi
+                if (isset($data['population'])) {
+                    $country->population = $data['population'];
                 }
+
+                // Update GDP (dari data lain, tidak semua country punya)
+                if (isset($data['gdp'])) {
+                    $country->gdp = $data['gdp'];
+                }
+
+                $country->save();
+                $updated++;
             }
-            
+
             return [
                 'success' => true,
-                'message' => "Berhasil mengupdate {$count} negara",
-                'total' => $count,
-                'errors' => $errors,
-                'total_data' => count($countries)
+                'message' => "Berhasil update $updated negara",
+                'total' => $updated
             ];
-            
+
         } catch (\Exception $e) {
-            Log::error('CountryService Error: ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
-    
-    // ... method lainnya
+
+    /**
+     * Ambil GDP dan Inflasi dari World Bank API (untuk negara tertentu)
+     */
+    public function fetchWorldBankData($countryCode)
+    {
+        try {
+            $data = ['gdp' => null, 'inflation' => null];
+
+            // GDP
+            $gdpResponse = Http::timeout(15)->get("http://api.worldbank.org/v2/country/{$countryCode}/indicator/NY.GDP.MKTP.CD?format=json");
+            if ($gdpResponse->successful()) {
+                $gdpData = $gdpResponse->json();
+                if (isset($gdpData[1]) && is_array($gdpData[1])) {
+                    foreach ($gdpData[1] as $item) {
+                        if (isset($item['value']) && $item['value'] !== null) {
+                            $data['gdp'] = $item['value'];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Inflasi
+            $inflationResponse = Http::timeout(15)->get("http://api.worldbank.org/v2/country/{$countryCode}/indicator/FP.CPI.TOTL.ZG?format=json");
+            if ($inflationResponse->successful()) {
+                $inflationData = $inflationResponse->json();
+                if (isset($inflationData[1]) && is_array($inflationData[1])) {
+                    foreach ($inflationData[1] as $item) {
+                        if (isset($item['value']) && $item['value'] !== null) {
+                            $data['inflation'] = $item['value'];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Update database
+            $country = Country::where('country_code', $countryCode)->first();
+            if ($country) {
+                if ($data['gdp']) $country->gdp = $data['gdp'];
+                if ($data['inflation']) $country->inflation = $data['inflation'];
+                $country->save();
+            }
+
+            return $data;
+
+        } catch (\Exception $e) {
+            return ['gdp' => null, 'inflation' => null];
+        }
+    }
+
+    /**
+     * Update semua negara dengan data dari World Bank (untuk 20 negara utama)
+     */
+    public function updateWorldBankData()
+    {
+        $mainCountries = ['ID', 'US', 'GB', 'DE', 'CN', 'JP', 'IN', 'BR', 'AU', 'CA', 'FR', 'IT', 'KR', 'MX', 'RU', 'SA', 'ZA', 'TR', 'AR', 'NG'];
+        $results = [];
+
+        foreach ($mainCountries as $code) {
+            $data = $this->fetchWorldBankData($code);
+            $country = Country::where('country_code', $code)->first();
+            $results[] = [
+                'country' => $country ? $country->country_name : $code,
+                'gdp' => $data['gdp'],
+                'inflation' => $data['inflation']
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Update semua data (populasi dari REST Countries)
+     */
+    public function updateAllCountries()
+    {
+        return $this->updateCountryData();
+    }
 }

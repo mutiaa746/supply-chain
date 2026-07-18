@@ -13,12 +13,11 @@ class AdminMiddleware
         if (!Auth::check()) {
             return redirect('/login');
         }
-        
-        // Cek apakah user adalah admin (email admin@example.com)
-        if (Auth::user()->email !== 'admin@example.com') {
+
+        if (Auth::user()->email != 'admin@example.com') {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        
+
         return $next($request);
     }
 }

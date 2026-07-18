@@ -7,6 +7,9 @@
     <div class="col-md-12">
         <h1 class="mb-4">⚓ Manage Ports</h1>
         <a href="/admin/ports/create" class="btn btn-primary mb-3">+ Add Port</a>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
     </div>
 </div>
 
@@ -17,14 +20,7 @@
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Port Name</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
+                            <tr><th>ID</th><th>Port Name</th><th>Latitude</th><th>Longitude</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @foreach($ports as $port)
@@ -37,9 +33,8 @@
                                 <td>
                                     <a href="/admin/ports/{{ $port->id }}/edit" class="btn btn-warning btn-sm">Edit</a>
                                     <form action="/admin/ports/{{ $port->id }}" method="POST" style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this port?')">Delete</button>
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</button>
                                     </form>
                                 </td>
                             </tr>

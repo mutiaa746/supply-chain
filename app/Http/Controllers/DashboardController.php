@@ -7,34 +7,75 @@ use App\Models\RiskScore;
 use App\Models\NewsCache;
 use App\Models\Port;
 use App\Models\ExchangeRate;
+use App\Models\WeatherData;
+use App\Services\WeatherService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // STATISTIK
+        // ========== STATISTIK ==========
         $totalCountries = Country::count();
         $totalPorts = Port::count();
         $totalNews = NewsCache::count();
 
-        // RISK
+        // ========== RISK ==========
         $highRisk = RiskScore::whereIn('risk_level', ['High', 'Critical'])->count();
         $mediumRisk = RiskScore::where('risk_level', 'Medium')->count();
         $lowRisk = RiskScore::where('risk_level', 'Low')->count();
 
-        // RECENT RISK (10 data)
-        $recentRisks = RiskScore::with('country')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+        // ========== DROPDOWN COUNTRIES ==========
+        $countries = Country::orderBy('country_name')->get();
+        $selectedCountry = null;
+        $selectedRisk = null;
+        $weather = null;
+        $news = collect();
+        $ports = collect();
 
-        // EXCHANGE RATES (10 mata uang utama)
+        // Jika ada parameter country, ambil data negara tersebut
+        if ($request->has('country') && $request->country) {
+            $selectedCountry = Country::with('riskScores')->find($request->country);
+        } else {
+            // Default: ambil negara pertama (Indonesia atau lainnya)
+            $selectedCountry = Country::first();
+        }
+
+        if ($selectedCountry) {
+            // Risk terbaru
+            $selectedRisk = $selectedCountry->riskScores()->latest()->first();
+
+            // Weather
+            if ($selectedCountry->latitude && $selectedCountry->longitude) {
+                try {
+                    $weatherService = new WeatherService();
+                    $weatherRaw = $weatherService->getWeather($selectedCountry->latitude, $selectedCountry->longitude);
+                    if ($weatherRaw && isset($weatherRaw['current_weather'])) {
+                        $weather = $weatherRaw['current_weather'];
+                        $weather['description'] = $weatherService->getWeatherDescription(
+                            $weatherRaw['current_weather']['weathercode'] ?? 0
+                        );
+                    }
+                } catch (\Exception $e) {
+                    $weather = null;
+                }
+            }
+
+            // News (5 terbaru)
+            $news = NewsCache::where('country_code', $selectedCountry->country_code)
+                ->orderBy('published_at', 'desc')
+                ->limit(5)
+                ->get();
+
+            // Ports
+            $ports = Port::where('country_id', $selectedCountry->id)->limit(5)->get();
+        }
+
+        // ========== EXCHANGE RATES UNTUK GRAFIK (DI ECONOMIC) ==========
         $exchangeRates = ExchangeRate::where('base_currency', 'USD')
             ->whereIn('target_currency', ['IDR', 'EUR', 'GBP', 'JPY', 'CNY', 'SGD', 'MYR', 'PHP', 'THB', 'VND'])
             ->get();
 
-        // Jika kosong, pakai default
         if ($exchangeRates->isEmpty()) {
             $exchangeRates = collect([
                 (object) ['target_currency' => 'IDR', 'rate' => 15500],
@@ -68,7 +109,12 @@ class DashboardController extends Controller
             'highRisk',
             'mediumRisk',
             'lowRisk',
-            'recentRisks',
+            'countries',
+            'selectedCountry',
+            'selectedRisk',
+            'weather',
+            'news',
+            'ports',
             'chartData',
             'riskDistribution'
         ));

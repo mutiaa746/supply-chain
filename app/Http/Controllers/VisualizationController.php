@@ -7,16 +7,11 @@ use App\Models\ExchangeRate;
 use App\Models\RiskScore;
 use Illuminate\Http\Request;
 
-class EconomicIndicatorController extends Controller
+class VisualizationController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // ========== DATA NEGARA ==========
-        $countries = Country::select('id', 'country_name', 'country_code', 'flag', 'gdp', 'inflation', 'population', 'currency')
-            ->orderBy('country_name')
-            ->get();
-
-        // ========== DATA GDP ==========
+        // ========== 1. GDP DATA ==========
         $gdpData = Country::whereNotNull('gdp')
             ->orderBy('gdp', 'desc')
             ->limit(10)
@@ -24,11 +19,11 @@ class EconomicIndicatorController extends Controller
             ->map(function($item) {
                 return [
                     'country' => $item->country_name,
-                    'gdp' => round($item->gdp / 1000000000000, 2)
+                    'gdp' => $item->gdp / 1000000000000 // Convert ke Trillion
                 ];
             });
 
-        // ========== DATA INFLASI ==========
+        // ========== 2. INFLATION DATA ==========
         $inflationData = Country::whereNotNull('inflation')
             ->orderBy('inflation', 'desc')
             ->limit(10)
@@ -40,7 +35,7 @@ class EconomicIndicatorController extends Controller
                 ];
             });
 
-        // ========== DATA KURS UNTUK GRAFIK ==========
+        // ========== 3. CURRENCY DATA ==========
         $currencyData = ExchangeRate::where('base_currency', 'USD')
             ->whereIn('target_currency', ['IDR', 'EUR', 'GBP', 'JPY', 'CNY', 'SGD', 'MYR', 'PHP', 'THB', 'VND'])
             ->get()
@@ -51,13 +46,7 @@ class EconomicIndicatorController extends Controller
                 ];
             });
 
-        // ========== DATA EXCHANGE CHART (Multi Currency) ==========
-        $mainCurrencies = ['IDR', 'EUR', 'GBP', 'JPY', 'CNY', 'SGD', 'MYR', 'PHP', 'THB', 'VND'];
-        $chartRates = ExchangeRate::where('base_currency', 'USD')
-            ->whereIn('target_currency', $mainCurrencies)
-            ->get();
-
-        // ========== DATA RISK ==========
+        // ========== 4. RISK DATA ==========
         $riskData = RiskScore::with('country')
             ->orderBy('total_score', 'desc')
             ->limit(10)
@@ -69,28 +58,19 @@ class EconomicIndicatorController extends Controller
                 ];
             });
 
-        // ========== DATA RISK DISTRIBUTION ==========
+        // ========== 5. RISK DISTRIBUTION ==========
         $riskDistribution = [
             'High' => RiskScore::whereIn('risk_level', ['High', 'Critical'])->count(),
             'Medium' => RiskScore::where('risk_level', 'Medium')->count(),
             'Low' => RiskScore::where('risk_level', 'Low')->count()
         ];
 
-        // ========== DATA EXCHANGE RATES UNTUK TABEL ==========
-        $exchangeRates = ExchangeRate::where('base_currency', 'USD')
-            ->orderBy('target_currency')
-            ->limit(30)
-            ->get();
-
-        return view('economic.index', compact(
-            'countries',
+        return view('visualization.index', compact(
             'gdpData',
             'inflationData',
             'currencyData',
             'riskData',
-            'riskDistribution',
-            'exchangeRates',
-            'chartRates'
+            'riskDistribution'
         ));
     }
 }
