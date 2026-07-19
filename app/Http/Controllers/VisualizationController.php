@@ -19,7 +19,7 @@ class VisualizationController extends Controller
             ->map(function($item) {
                 return [
                     'country' => $item->country_name,
-                    'gdp' => $item->gdp / 1000000000000 // Convert ke Trillion
+                    'gdp' => round($item->gdp / 1000000000000, 2)
                 ];
             });
 

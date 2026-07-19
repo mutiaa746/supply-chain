@@ -44,6 +44,7 @@ use App\Http\Controllers\VisualizationController;
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/countries', [CountryController::class, 'index'])->name('countries');
     Route::get('/countries/{id}', [CountryController::class, 'show'])->name('countries.show');
+    
 
     // ========== WEATHER ==========
     Route::get('/weather', [WeatherController::class, 'index'])->name('weather');
@@ -67,7 +68,7 @@ use App\Http\Controllers\VisualizationController;
 
     // ========== PORTS ==========
     Route::get('/ports', [PortController::class, 'index'])->name('ports');
-    Route::get('/ports/map', [PortController::class, 'map'])->name('ports.map');
+    Route::get('/ports/fetch', [PortController::class, 'fetchPorts'])->name('ports.fetch');
 
     // ========== RISK ==========
     Route::get('/risk', [RiskScoreController::class, 'index'])->name('risk');
@@ -87,8 +88,7 @@ use App\Http\Controllers\VisualizationController;
     Route::post('/watchlist/toggle', [\App\Http\Controllers\WatchlistController::class, 'toggle'])->name('watchlist.toggle');
   
     // ========== VISUALIZATION ==========
-    Route::get('/visualization', [VisualizationController::class, 'index'])->name('visualization');
-    
+    Route::get('/visualization', [App\Http\Controllers\VisualizationController::class, 'index'])->name('visualization');   
     Route::get('/update-countries-data', function () {
     $service = new \App\Services\CountryService();
     $results = $service->updateAllCountries();

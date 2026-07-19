@@ -5,110 +5,93 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <h1 class="mb-4">📊 Data Visualization Dashboard</h1>
-        <p class="text-muted">Visualisasi data ekonomi dan risiko</p>
+        <h1 class="mb-4">📊 Data Visualization</h1>
+        <p class="text-muted">Visualisasi data ekonomi, kurs, dan risiko</p>
     </div>
 </div>
 
-<!-- 4 GRAFIK -->
+<!-- ROW 1: GDP + INFLATION -->
 <div class="row">
-    <!-- GDP CHART -->
     <div class="col-md-6 mb-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">💰 GDP Top 10 Countries (Trillion USD)</h5>
-            </div>
+            <div class="card-header">💰 GDP Top 10 Countries (Trillion USD)</div>
             <div class="card-body">
-                <canvas id="gdpChart" height="250"></canvas>
+                <canvas id="gdpChart" height="200"></canvas>
             </div>
         </div>
     </div>
-
-    <!-- INFLATION CHART -->
     <div class="col-md-6 mb-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">📈 Inflation Top 10 Countries (%)</h5>
-            </div>
+            <div class="card-header">📈 Inflation Top 10 Countries (%)</div>
             <div class="card-body">
-                <canvas id="inflationChart" height="250"></canvas>
+                <canvas id="inflationChart" height="200"></canvas>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ROW 2: CURRENCY + RISK -->
 <div class="row">
-    <!-- CURRENCY CHART -->
     <div class="col-md-6 mb-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">💱 Exchange Rates (USD = 1)</h5>
-            </div>
+            <div class="card-header">💱 Exchange Rates (USD = 1)</div>
             <div class="card-body">
-                <canvas id="currencyChart" height="250"></canvas>
+                <canvas id="currencyChart" height="200"></canvas>
             </div>
         </div>
     </div>
-
-    <!-- RISK CHART -->
     <div class="col-md-6 mb-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">⚠️ Risk Score Top 10 Countries</h5>
-            </div>
+            <div class="card-header">⚠️ Risk Score Top 10 Countries</div>
             <div class="card-body">
-                <canvas id="riskChart" height="250"></canvas>
+                <canvas id="riskChart" height="200"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- RISK DISTRIBUTION -->
-<div class="row">
-    <div class="col-md-12">
+<!-- ROW 3: RISK DISTRIBUTION -->
+<div class="row mb-4">
+    <div class="col-md-6">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">📊 Risk Distribution</h5>
-            </div>
+            <div class="card-header">📊 Risk Distribution</div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <canvas id="riskDistributionChart" height="200"></canvas>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Level</th>
-                                        <th>Count</th>
-                                        <th>Percentage</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $total = array_sum($riskDistribution);
-                                    @endphp
-                                    <tr>
-                                        <td><span class="badge bg-danger">🔴 High</span></td>
-                                        <td>{{ $riskDistribution['High'] }}</td>
-                                        <td>{{ $total > 0 ? round(($riskDistribution['High'] / $total) * 100, 1) : 0 }}%</td>
-                                    </tr>
-                                    <tr>
-                                        <td><span class="badge bg-warning">🟡 Medium</span></td>
-                                        <td>{{ $riskDistribution['Medium'] }}</td>
-                                        <td>{{ $total > 0 ? round(($riskDistribution['Medium'] / $total) * 100, 1) : 0 }}%</td>
-                                    </tr>
-                                    <tr>
-                                        <td><span class="badge bg-success">🟢 Low</span></td>
-                                        <td>{{ $riskDistribution['Low'] }}</td>
-                                        <td>{{ $total > 0 ? round(($riskDistribution['Low'] / $total) * 100, 1) : 0 }}%</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <canvas id="riskDistributionChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">📋 Summary</div>
+            <div class="card-body">
+                @php $total = array_sum($riskDistribution); @endphp
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Level</th><th>Count</th><th>Percentage</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge bg-danger">🔴 High</span></td>
+                            <td>{{ $riskDistribution['High'] ?? 0 }}</td>
+                            <td>{{ $total > 0 ? round(($riskDistribution['High'] / $total) * 100, 1) : 0 }}%</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-warning">🟡 Medium</span></td>
+                            <td>{{ $riskDistribution['Medium'] ?? 0 }}</td>
+                            <td>{{ $total > 0 ? round(($riskDistribution['Medium'] / $total) * 100, 1) : 0 }}%</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-success">🟢 Low</span></td>
+                            <td>{{ $riskDistribution['Low'] ?? 0 }}</td>
+                            <td>{{ $total > 0 ? round(($riskDistribution['Low'] / $total) * 100, 1) : 0 }}%</td>
+                        </tr>
+                        <tr class="table-active">
+                            <td><strong>Total</strong></td>
+                            <td><strong>{{ $total }}</strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -121,8 +104,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Chart.js loaded!');
 
-    // ========== GDP CHART ==========
+    // ========== 1. GDP CHART ==========
     var gdpData = @json($gdpData ?? []);
+    console.log('GDP Data:', gdpData);
     if (gdpData.length > 0) {
         new Chart(document.getElementById('gdpChart'), {
             type: 'bar',
@@ -144,8 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== INFLATION CHART ==========
+    // ========== 2. INFLATION CHART ==========
     var inflationData = @json($inflationData ?? []);
+    console.log('Inflation Data:', inflationData);
     if (inflationData.length > 0) {
         new Chart(document.getElementById('inflationChart'), {
             type: 'bar',
@@ -167,8 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== CURRENCY CHART ==========
+    // ========== 3. CURRENCY CHART ==========
     var currencyData = @json($currencyData ?? []);
+    console.log('Currency Data:', currencyData);
     if (currencyData.length > 0) {
         new Chart(document.getElementById('currencyChart'), {
             type: 'bar',
@@ -190,8 +176,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== RISK CHART ==========
+    // ========== 4. RISK CHART ==========
     var riskData = @json($riskData ?? []);
+    console.log('Risk Data:', riskData);
     if (riskData.length > 0) {
         new Chart(document.getElementById('riskChart'), {
             type: 'bar',
@@ -215,8 +202,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== RISK DISTRIBUTION CHART ==========
+    // ========== 5. RISK DISTRIBUTION CHART ==========
     var riskDistribution = @json($riskDistribution ?? []);
+    console.log('Risk Distribution:', riskDistribution);
     new Chart(document.getElementById('riskDistributionChart'), {
         type: 'doughnut',
         data: {

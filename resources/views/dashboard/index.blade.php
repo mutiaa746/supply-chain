@@ -10,6 +10,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #f0f2f5; font-family: Arial, sans-serif; }
+        
         .sidebar {
             position: fixed; top: 0; left: 0; width: 250px; height: 100vh;
             background: #1a1a2e; color: white; padding-top: 20px; z-index: 1000; overflow-y: auto;
@@ -24,11 +25,31 @@
         .sidebar .logout-btn { background: none; border: none; color: #b0b0b0; padding: 12px 20px; width: 100%; text-align: left; display: flex; align-items: center; cursor: pointer; border-left: 3px solid transparent; transition: all 0.3s; }
         .sidebar .logout-btn:hover { background: rgba(255,0,0,0.1); color: #ff6b6b; border-left-color: #ff6b6b; }
         .sidebar .logout-btn i { width: 25px; margin-right: 10px; }
+        
         .main-content { margin-left: 250px; padding: 20px 30px; min-height: 100vh; }
         .menu-toggle { display: none; position: fixed; top: 10px; left: 10px; z-index: 1001; background: #1a1a2e; color: white; border: none; padding: 10px 15px; border-radius: 5px; font-size: 20px; cursor: pointer; }
         @media (max-width: 768px) { .sidebar { left: -250px; } .sidebar.open { left: 0; } .main-content { margin-left: 0; } .menu-toggle { display: block; } }
+        
         .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px; }
         .card-header { font-weight: bold; font-size: 16px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .stat-card { padding: 20px; border-radius: 10px; color: white; }
+        .stat-card h2 { margin: 0; font-size: 30px; }
+        .stat-card .title { opacity: 0.8; font-size: 14px; }
+        .bg-blue { background: linear-gradient(135deg, #4e73df, #224abe); }
+        .bg-green { background: linear-gradient(135deg, #1cc88a, #13855c); }
+        .bg-red { background: linear-gradient(135deg, #e74a3b, #be2617); }
+        .bg-cyan { background: linear-gradient(135deg, #36b9cc, #206d7a); }
+        
+        .row { display: flex; flex-wrap: wrap; gap: 15px; }
+        .col-3 { flex: 1; min-width: 200px; }
+        .col-4 { flex: 1; min-width: 250px; }
+        .col-6 { flex: 1; min-width: 300px; }
+        .col-12 { width: 100%; }
+        .mb-4 { margin-bottom: 20px; }
+        .mb-3 { margin-bottom: 15px; }
+        .mt-4 { margin-top: 20px; }
+        .text-muted { color: #888; }
+        .text-center { text-align: center; }
         .table { width: 100%; border-collapse: collapse; }
         .table th, .table td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
         .table tr:hover { background: #f5f5f5; }
@@ -37,36 +58,22 @@
         .badge-warning { background: #f6c23e; color: #333; }
         .badge-success { background: #1cc88a; }
         .badge-info { background: #36b9cc; }
+        .form-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
         .btn { background: #4e73df; color: white; padding: 6px 15px; border-radius: 5px; border: none; }
         .btn:hover { background: #224abe; color: white; }
-        .btn-primary { background: #4e73df; color: white; padding: 6px 15px; border-radius: 5px; border: none; }
+        .btn-primary { background: #4e73df; color: white; }
         .btn-primary:hover { background: #224abe; }
-        .btn-sm { padding: 4px 10px; font-size: 12px; }
-        .form-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
-        .row { display: flex; flex-wrap: wrap; gap: 15px; }
-        .col-3 { flex: 1; min-width: 200px; }
-        .col-4 { flex: 1; min-width: 250px; }
-        .col-6 { flex: 1; min-width: 300px; }
-        .col-12 { width: 100%; }
-        .mb-4 { margin-bottom: 20px; }
-        .mb-0 { margin-bottom: 0; }
-        .mt-2 { margin-top: 10px; }
-        .text-muted { color: #888; }
-        .text-center { text-align: center; }
-        .fs-6 { font-size: 16px; }
-        .px-3 { padding-left: 15px; padding-right: 15px; }
-        .py-2 { padding-top: 10px; padding-bottom: 10px; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .input-group { display: flex; }
+        .form-control { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; flex: 1; }
         .table-responsive { overflow-x: auto; }
         .me-2 { margin-right: 10px; }
         .ms-2 { margin-left: 10px; }
         .float-end { float: right; }
         canvas { max-height: 250px; width: 100% !important; }
-        .display-1 { font-size: 60px; }
-        .btn-warning { background: #f6c23e; color: #333; border: none; padding: 6px 15px; border-radius: 5px; }
-        .btn-warning:hover { background: #d39e00; color: #333; }
-        .btn-danger { background: #e74a3b; color: white; border: none; padding: 6px 15px; border-radius: 5px; }
-        .btn-danger:hover { background: #be2617; color: white; }
-        .border p-2 rounded { border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+        .display-1 { font-size: 48px; }
+        .border-bottom { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -75,15 +82,15 @@
     <nav class="sidebar" id="sidebar">
         <div class="brand"><h4>🚢 RiskIntel</h4><small>Supply Chain Risk</small></div>
         <a class="nav-link active" href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
-        <a class="nav-link" href="/countries"><i class="fas fa-globe"></i> Countries</a>
         <a class="nav-link" href="/weather"><i class="fas fa-cloud-sun"></i> Weather</a>
         <a class="nav-link" href="/economic"><i class="fas fa-chart-line"></i> Economic</a>
         <a class="nav-link" href="/exchange"><i class="fas fa-money-bill-wave"></i> Exchange</a>
         <a class="nav-link" href="/news"><i class="fas fa-newspaper"></i> News</a>
         <a class="nav-link" href="/ports"><i class="fas fa-anchor"></i> Ports</a>
-        <a class="nav-link" href="/ports/map"><i class="fas fa-map"></i> Port Map</a>
         <a class="nav-link" href="/risk"><i class="fas fa-exclamation-triangle"></i> Risk</a>
+        <a class="nav-link" href="/visualization"><i class="fas fa-chart-pie"></i> Visualization</a>
         <a class="nav-link" href="/route-simulation"><i class="fas fa-route"></i> Route Simulation</a>
+        <a class="nav-link" href="/compare"><i class="fas fa-arrows-left-right"></i> Compare</a>
         <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Profile</a>
         <form method="POST" action="/logout" style="margin:0;">
             @csrf
@@ -101,21 +108,31 @@
 
             <!-- STATISTIK -->
             <div class="row mb-4">
-                <div class="col-3"><div class="card text-white bg-primary"><div class="card-body"><h5 class="card-title">🌍 Countries</h5><h2 class="mb-0">{{ $totalCountries ?? 0 }}</h2></div></div></div>
-                <div class="col-3"><div class="card text-white bg-success"><div class="card-body"><h5 class="card-title">⚓ Ports</h5><h2 class="mb-0">{{ $totalPorts ?? 0 }}</h2></div></div></div>
-                <div class="col-3"><div class="card text-white bg-danger"><div class="card-body"><h5 class="card-title">⚠️ High Risk</h5><h2 class="mb-0">{{ $highRisk ?? 0 }}</h2></div></div></div>
-                <div class="col-3"><div class="card text-white bg-info"><div class="card-body"><h5 class="card-title">📰 News</h5><h2 class="mb-0">{{ $totalNews ?? 0 }}</h2></div></div></div>
+                <div class="col-3"><div class="stat-card bg-blue"><div class="title">🌍 Countries</div><h2>{{ $totalCountries ?? 0 }}</h2></div></div>
+                <div class="col-3"><div class="stat-card bg-green"><div class="title">⚓ Ports</div><h2>{{ $totalPorts ?? 0 }}</h2></div></div>
+                <div class="col-3"><div class="stat-card bg-red"><div class="title">⚠️ High Risk</div><h2>{{ $highRisk ?? 0 }}</h2></div></div>
+                <div class="col-3"><div class="stat-card bg-cyan"><div class="title">📰 News</div><h2>{{ $totalNews ?? 0 }}</h2></div></div>
             </div>
 
-            <!-- COUNTRY SELECTOR -->
+            <!-- SEARCH -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header"><h5 class="mb-0">🌍 Pilih Negara</h5></div>
+                        <div class="card-header"><h5 class="mb-0">🔍 Cari Negara</h5></div>
                         <div class="card-body">
                             <form method="GET" class="row">
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control" placeholder="Ketik nama negara..." value="{{ $search ?? '' }}">
+                                        <button type="submit" class="btn btn-primary">Cari</button>
+                                        @if($search)
+                                            <a href="{{ route('dashboard') }}" class="btn btn-secondary">Reset</a>
+                                        @endif
+                                    </div>
+                                </div>
                                 <div class="col-md-4">
                                     <select name="country" class="form-select" onchange="this.form.submit()">
+                                        <option value="">-- Pilih dari Daftar --</option>
                                         @foreach($countries as $c)
                                         <option value="{{ $c->id }}" {{ $selectedCountry && $selectedCountry->id == $c->id ? 'selected' : '' }}>
                                             {{ $c->country_name }}
@@ -129,15 +146,15 @@
                 </div>
             </div>
 
-            <!-- DETAIL NEGARA (SEPERTI DI COUNTRIES) -->
+            <!-- DETAIL NEGARA -->
             @if($selectedCountry)
-            <div class="row">
-                <!-- Country Info -->
-                <div class="col-md-4">
+            <div class="row mb-4">
+                <div class="col-4">
                     <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">📋 Country Info</h5>
-                        </div>
+                        <div class="card-header bg-primary text-white"><h5 class="mb-0">
+                            @if($selectedCountry->flag)<img src="{{ $selectedCountry->flag }}" width="30" height="20" class="me-2">@else<img src="https://flagcdn.com/w40/{{ strtolower($selectedCountry->country_code) }}.png" width="30" height="20" class="me-2">@endif
+                            {{ $selectedCountry->country_name }}
+                        </h5></div>
                         <div class="card-body">
                             <table class="table table-sm">
                                 <tr><th>Capital</th><td>{{ $selectedCountry->capital ?? '-' }}</td></tr>
@@ -150,168 +167,62 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Risk Score -->
-                <div class="col-md-4">
+                <div class="col-4">
                     <div class="card">
-                        <div class="card-header bg-warning text-white">
-                            <h5 class="mb-0">⚠️ Risk Score</h5>
-                        </div>
+                        <div class="card-header bg-warning text-white"><h5 class="mb-0">⚠️ Risk Score</h5></div>
                         <div class="card-body">
                             @if($selectedRisk)
                             <table class="table table-sm">
-                                <tr><th>Weather Risk</th><td>{{ $selectedRisk->weather_score }}</td></tr>
-                                <tr><th>Inflation Risk</th><td>{{ $selectedRisk->inflation_score }}</td></tr>
-                                <tr><th>Currency Risk</th><td>{{ $selectedRisk->currency_score }}</td></tr>
-                                <tr><th>Political Risk</th><td>{{ $selectedRisk->news_score }}</td></tr>
+                                <tr><th>Weather</th><td>{{ $selectedRisk->weather_score }}</td></tr>
+                                <tr><th>Inflation</th><td>{{ $selectedRisk->inflation_score }}</td></tr>
+                                <tr><th>Currency</th><td>{{ $selectedRisk->currency_score }}</td></tr>
+                                <tr><th>Political</th><td>{{ $selectedRisk->news_score }}</td></tr>
                                 <tr><th><strong>Total</strong></th><td><strong>{{ $selectedRisk->total_score }}</strong></td></tr>
                                 <tr><th>Level</th>
-                                    <td>
-                                        @php
-                                            $level = $selectedRisk->risk_level ?? 'Low';
-                                            $color = $level == 'Critical' ? 'danger' : ($level == 'High' ? 'warning' : ($level == 'Medium' ? 'info' : 'success'));
-                                        @endphp
-                                        <span class="badge bg-{{ $color }} fs-6">{{ $level }}</span>
-                                    </td>
-                                </tr>
+                                    <td>@php $level = $selectedRisk->risk_level ?? 'Low'; $color = $level == 'Critical' ? 'danger' : ($level == 'High' ? 'warning' : ($level == 'Medium' ? 'info' : 'success')); @endphp
+                                    <span class="badge bg-{{ $color }}">{{ $level }}</span>
+                                </td></tr>
                             </table>
-                            @else
-                            <p class="text-muted">No risk data available.</p>
-                            @endif
+                            @else <p class="text-muted">No risk data</p> @endif
                         </div>
                     </div>
                 </div>
-
-                <!-- Weather -->
-                <div class="col-md-4">
+                <div class="col-4">
                     <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0">🌤️ Current Weather</h5>
-                        </div>
+                        <div class="card-header bg-info text-white"><h5 class="mb-0">🌤️ Weather</h5></div>
                         <div class="card-body text-center">
                             @if($weather)
-                                @php
-                                    $temp = $weather['temperature'] ?? 0;
-                                    $wind = $weather['windspeed'] ?? 0;
-                                    $code = $weather['weathercode'] ?? 0;
-                                    $desc = $weather['description'] ?? 'Unknown';
-                                @endphp
-                                <div class="display-1">
-                                    @if($temp > 30) ☀️
-                                    @elseif($temp > 20) ⛅
-                                    @elseif($temp > 10) 🌤️
-                                    @elseif($temp > 0) 🌧️
-                                    @else ❄️
-                                    @endif
-                                </div>
+                                @php $temp = $weather['temperature'] ?? 0; $desc = $weather['description'] ?? 'Tidak Diketahui'; @endphp
+                                <div class="display-1">@if($temp > 30) ☀️ @elseif($temp > 20) ⛅ @elseif($temp > 10) 🌤️ @elseif($temp > 0) 🌧️ @else ❄️ @endif</div>
                                 <h2>{{ $temp }}°C</h2>
                                 <p>{{ $desc }}</p>
-                                <p class="text-muted">Wind: {{ $wind }} km/h</p>
-                            @else
-                                <p class="text-muted">Weather data not available</p>
-                            @endif
+                                <p class="text-muted">Wind: {{ $weather['windspeed'] ?? 0 }} km/h</p>
+                            @else <p class="text-muted">Weather not available</p> @endif
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- News -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header bg-secondary text-white">
-                            <h5 class="mb-0">📰 Latest News</h5>
-                        </div>
-                        <div class="card-body">
-                            @if($news->count() > 0)
-                                <div class="row">
-                                    @foreach($news as $item)
-                                    <div class="col-md-6 mb-2">
-                                        <div class="border p-2 rounded">
-                                            <h6>{{ $item->title }}</h6>
-                                            <p class="text-muted small">{{ Str::limit($item->description ?? '', 100) }}</p>
-                                            @php
-                                                $sentiment = $item->sentiment ?? 'neutral';
-                                                $color = $sentiment == 'positive' ? 'success' : ($sentiment == 'negative' ? 'danger' : 'secondary');
-                                            @endphp
-                                            <span class="badge bg-{{ $color }}">{{ ucfirst($sentiment) }}</span>
-                                            <small class="text-muted ms-2">{{ $item->source ?? 'Unknown' }}</small>
-                                            @if($item->url && $item->url != '#')
-                                                <a href="{{ $item->url }}" target="_blank" class="btn btn-sm btn-outline-primary float-end">Read</a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <p class="text-muted">No news available. <a href="/news/fetch/{{ $selectedCountry->country_code }}" class="btn btn-sm btn-primary ms-2">Fetch news</a></p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ports -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0">⚓ Ports in {{ $selectedCountry->country_name }}</h5>
-                        </div>
-                        <div class="card-body">
-                            @if($ports->count() > 0)
-                                <div class="table-responsive">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr><th>Port Name</th><th>Type</th><th>Size</th><th>Status</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($ports as $port)
-                                            <tr>
-                                                <td>{{ $port->port_name }}</td>
-                                                <td>{{ $port->harbor_type ?? '-' }}</td>
-                                                <td>{{ $port->harbor_size ?? '-' }}</td>
-                                                <td>
-                                                    @php
-                                                        $status = $port->status ?? 'Unknown';
-                                                        $color = $status == 'Operational' ? 'success' : ($status == 'Under Construction' ? 'warning' : 'danger');
-                                                    @endphp
-                                                    <span class="badge bg-{{ $color }}">{{ $status }}</span>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <p class="text-muted">No ports data available for this country.</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Watchlist Button -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    @auth
-                        @php
-                            $isWatched = \App\Models\Watchlist::where('user_id', Auth::id())
-                                ->where('country_id', $selectedCountry->id)
-                                ->exists();
-                        @endphp
-                        <form action="{{ route('watchlist.toggle') }}" method="POST" style="display:inline;">
-                            @csrf
-                            <input type="hidden" name="country_id" value="{{ $selectedCountry->id }}">
-                            <button type="submit" class="btn {{ $isWatched ? 'btn-danger' : 'btn-warning' }}">
-                                <i class="fas fa-star"></i>
-                                {{ $isWatched ? ' Hapus dari Pantauan' : ' Tambah ke Pantauan' }}
-                            </button>
-                        </form>
-                    @endauth
                 </div>
             </div>
             @endif
+
+            <!-- GRAFIK -->
+            <div class="row mt-4">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header"><h5 class="mb-0">💰 Exchange Rates (USD Base)</h5></div>
+                        <div class="card-body">
+                            <canvas id="exchangeChart" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header"><h5 class="mb-0">📊 Risk Distribution</h5></div>
+                        <div class="card-body">
+                            <canvas id="riskChart" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -320,6 +231,71 @@
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('open');
         });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Chart.js loaded!', typeof Chart !== 'undefined');
+
+        // ========== EXCHANGE CHART ==========
+        var exchangeData = @json($chartData ?? []);
+        console.log('Exchange Data:', exchangeData);
+
+        var exchangeCtx = document.getElementById('exchangeChart');
+        if (exchangeCtx && exchangeData.labels && exchangeData.labels.length > 0) {
+            new Chart(exchangeCtx, {
+                type: 'bar',
+                data: {
+                    labels: exchangeData.labels,
+                    datasets: [{
+                        label: 'Exchange Rate (USD = 1)',
+                        data: exchangeData.rates,
+                        backgroundColor: ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#6f42c1','#fd7e14','#20c997','#0dcaf0','#d63384'],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            console.log('Exchange chart created!');
+        } else {
+            console.log('No exchange data');
+        }
+
+        // ========== RISK CHART ==========
+        var riskData = @json($riskDistribution ?? []);
+        console.log('Risk Data:', riskData);
+
+        var riskCtx = document.getElementById('riskChart');
+        if (riskCtx) {
+            var totalRisk = (riskData.High || 0) + (riskData.Medium || 0) + (riskData.Low || 0);
+            if (totalRisk > 0) {
+                new Chart(riskCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                        datasets: [{
+                            data: [riskData.High || 0, riskData.Medium || 0, riskData.Low || 0],
+                            backgroundColor: ['#e74a3b', '#f6c23e', '#1cc88a'],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+                console.log('Risk chart created!');
+            } else {
+                console.log('No risk data');
+            }
+        }
+    });
     </script>
 
 </body>
