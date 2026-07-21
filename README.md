@@ -1,10 +1,11 @@
- Global Supply Chain Risk Monitoring System
+                                     Global Supply Chain Risk Monitoring System
 
 Global Supply Chain Risk Monitoring System merupakan aplikasi berbasis web yang dikembangkan menggunakan Laravel Framework untuk membantu perusahaan maupun pengguna dalam memantau berbagai faktor yang dapat memengaruhi stabilitas rantai pasok (Global Supply Chain). Sistem ini mengintegrasikan beberapa sumber data eksternal, seperti kondisi cuaca, indikator ekonomi, nilai tukar mata uang, dan berita internasional sebagai dasar dalam melakukan analisis tingkat risiko pada suatu negara.
 
 Melalui aplikasi ini, pengguna dapat memperoleh informasi secara real-time mengenai kondisi yang berpotensi mengganggu proses distribusi barang, seperti cuaca ekstrem, perubahan ekonomi, fluktuasi nilai tukar mata uang, maupun peristiwa internasional. Seluruh informasi tersebut kemudian diolah menjadi Risk Score sehingga pengguna dapat mengevaluasi tingkat risiko setiap negara sebelum menentukan strategi distribusi.Selain menyediakan fitur monitoring, sistem juga dilengkapi dengan visualisasi data, simulasi rute distribusi, perbandingan antar negara, serta halaman administrator untuk mengelola data master yang digunakan oleh sistem.
 
  A. Fitur Utama
+ 
 👤 Halaman User
 
 1. Login User
@@ -49,6 +50,7 @@ Halaman Profile digunakan untuk mengelola informasi akun pengguna, seperti mempe
 
 
 👨‍💼 Halaman Admin
+
 Administrator memiliki hak akses penuh terhadap seluruh data yang digunakan dalam sistem.
 
 1. Login Admin
@@ -68,6 +70,7 @@ Halaman Manajemen Article digunakan untuk mengelola artikel atau berita yang aka
 
 
 B. Arsitektur Sistem
+
 Global Supply Chain Risk Monitoring System dibangun menggunakan arsitektur **Client–Server** dengan pola **Model–View–Controller (MVC)** yang diterapkan oleh Laravel Framework.
 
 Arsitektur
@@ -145,6 +148,7 @@ Seluruh data API diproses menjadi **Supply Chain Risk Score** yang digunakan dal
 
 
 F.  Instalasi
+
 1. Clone Repository
 ```bash
 git clone https://github.com/username/global-supply-chain-risk-monitoring.git
@@ -240,5 +244,6 @@ Program Studi Sistem Informasi
 
 
 Lisensi
+
 Proyek ini dikembangkan untuk memenuhi tugas ujian akhir semester pada mata kuliah pemograman web 2
 
