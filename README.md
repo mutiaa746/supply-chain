@@ -9,42 +9,54 @@ Melalui aplikasi ini, pengguna dapat memperoleh informasi secara real-time menge
 👤 Halaman User
 
 1. Login User
+   
 Halaman autentikasi yang digunakan pengguna untuk masuk ke dalam sistem menggunakan email dan password. Setelah proses login berhasil, pengguna akan diarahkan menuju Dashboard untuk mengakses seluruh fitur monitoring sesuai hak akses yang dimiliki.
 
 2. Dashboard
+
 Dashboard merupakan halaman utama yang menampilkan ringkasan kondisi supply chain secara keseluruhan. Halaman ini berisi statistik jumlah negara, jumlah pelabuhan, jumlah data monitoring, serta grafik tingkat risiko yang memberikan gambaran kondisi rantai pasok global secara cepat.Halaman Dasboard ini juga menampilkan daftar negara yang menjadi objek monitoring dalam sistem. Pengguna dapat melihat informasi setiap negara beserta data yang digunakan dalam proses analisis risiko supply chain.
 
 3. Weather Monitoring
+   
 Halaman Weather Monitoring menampilkan kondisi cuaca terkini dari setiap negara berdasarkan data yang diperoleh melalui Weather API. Informasi seperti suhu, kelembapan, kecepatan angin, maupun kondisi cuaca digunakan sebagai salah satu indikator dalam penilaian risiko karena cuaca ekstrem dapat menghambat aktivitas logistik dan distribusi barang.
 
 4. Economic Indicators
+   
 Halaman Economic Indicators menyajikan berbagai indikator ekonomi dari setiap negara, seperti pertumbuhan ekonomi, inflasi, maupun indikator ekonomi lainnya. Data ini digunakan sebagai acuan dalam menilai stabilitas ekonomi suatu negara yang berpengaruh terhadap kelancaran aktivitas perdagangan internasional.
 
 5. Exchange Rate
+   
 Halaman Exchange Rate menampilkan informasi nilai tukar mata uang berbagai negara secara real-time. Fluktuasi nilai tukar digunakan sebagai salah satu indikator risiko karena dapat memengaruhi biaya impor, ekspor, maupun transaksi perdagangan internasional.
 
 6. News Monitoring
+   
 Halaman News Monitoring menyajikan berita internasional terbaru yang berkaitan dengan negara-negara yang dipantau. Berita mengenai konflik, bencana alam, perubahan kebijakan pemerintah, maupun kondisi geopolitik digunakan sebagai referensi dalam mengidentifikasi potensi gangguan terhadap rantai pasok global.
 
-8. Port 
+7. Port
+    
 Halaman Port menampilkan informasi mengenai pelabuhan  yang ada disuatu negara yang ingin kita cari. Data pelabuhan membantu pengguna memahami lokasi pelabuhan dari peta pelabuhan yang tertampil
 
-9. Port Map
+8. Port Map
+   
 Port Map & Ship Tracking merupakan fitur yang menampilkan peta interaktif lokasi pelabuhan beserta posisi kapal dan status operasionalnya. Fitur ini membantu pengguna memantau aktivitas pelabuhan serta mendukung analisis dan pemantauan jalur distribusi pada Global Supply Chain.
 
-10. Risk
+9. Risk
+    
 Halaman Risk merupakan fitur utama aplikasi yang digunakan untuk menghitung tingkat risiko supply chain pada setiap negara. Perhitungan dilakukan dengan mengombinasikan data cuaca, indikator ekonomi, nilai tukar mata uang, serta berita internasional sehingga menghasilkan Risk Score yang dapat digunakan sebagai dasar pengambilan keputusan.
 
-11. Compare Country
+10. Compare Country
+    
 Halaman Compare Country memungkinkan pengguna membandingkan tingkat risiko beberapa negara secara bersamaan. Perbandingan dilakukan berdasarkan seluruh indikator yang tersedia sehingga pengguna dapat menentukan negara dengan tingkat risiko paling rendah maupun paling tinggi.
 
-12. Route Simulation
+11. Route Simulation
+    
 Halaman Route Simulation digunakan untuk melakukan simulasi jalur distribusi barang berdasarkan negara asal dan negara tujuan. Fitur ini membantu pengguna mengevaluasi potensi risiko yang mungkin terjadi selama proses distribusi sehingga dapat memilih rute yang lebih aman dan efisien.
 
-13. Watchlist
+12. Watchlist
+    
 Fitur Watchlist memungkinkan pengguna menyimpan daftar negara yang ingin dipantau secara khusus. Negara yang telah ditambahkan ke dalam Watchlist akan lebih mudah diakses sehingga proses monitoring dapat dilakukan dengan lebih cepat.
 
-14. Profile
+13. Profile
 
 Halaman Profile digunakan untuk mengelola informasi akun pengguna, seperti memperbarui data pribadi, mengganti password, serta melihat informasi akun yang sedang digunakan.
 
