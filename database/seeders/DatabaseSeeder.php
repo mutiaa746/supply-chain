@@ -10,6 +10,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            CountrySeeder::class,
+            PortSeeder::class,
+            ExchangeRateSeeder::class,
+            EconomicIndicatorSeeder::class,
+            SentimentWordsSeeder::class,
+            NewsCacheSeeder::class,
+            WeatherDataSeeder::class,
+            RiskScoreSeeder::class,
         ]);
     }
 }

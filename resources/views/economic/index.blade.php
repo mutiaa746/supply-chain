@@ -91,7 +91,6 @@
     <nav class="sidebar" id="sidebar">
         <div class="brand"><h4>🚢 RiskIntel</h4><small>Supply Chain Risk</small></div>
         <a class="nav-link" href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
-        <a class="nav-link" href="/countries"><i class="fas fa-globe"></i> Countries</a>
         <a class="nav-link" href="/weather"><i class="fas fa-cloud-sun"></i> Weather</a>
         <a class="nav-link active" href="/economic"><i class="fas fa-chart-line"></i> Economic</a>
         <a class="nav-link" href="/exchange"><i class="fas fa-money-bill-wave"></i> Exchange</a>
@@ -100,6 +99,7 @@
         <a class="nav-link" href="/ports/map"><i class="fas fa-map"></i> Port Map</a>
         <a class="nav-link" href="/risk"><i class="fas fa-exclamation-triangle"></i> Risk</a>
         <a class="nav-link" href="/route-simulation"><i class="fas fa-route"></i> Route Simulation</a>
+        <a class="nav-link" href="/compare"><i class="fas fa-arrows-left-right"></i> Compare</a>
         <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Profile</a>
         <form method="POST" action="/logout" style="margin:0;">
             @csrf

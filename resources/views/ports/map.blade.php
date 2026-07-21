@@ -72,13 +72,15 @@
         <div class="brand">🚢 RiskIntel <span>Supply Chain Risk</span></div>
         <div>
             <a href="/dashboard">Dashboard</a>
-            <a href="/countries">Countries</a>
             <a href="/weather">Weather</a>
+            <a href="/economic">Economic</a>
             <a href="/exchange">Exchange</a>
+            <a href="/news">News</a>
             <a href="/ports">Ports</a>
             <a href="/ports/map" class="active">Port Map</a>
             <a href="/risk">Risk</a>
-            <a href="/tracking">Tracking</a>
+            <a href="/route-simulation">Route Simulation</a>
+            <a href="/compare">Compare</a>
             <a href="/profile">Profile</a>
             <form method="POST" action="/logout" style="display:inline;">
                 @csrf

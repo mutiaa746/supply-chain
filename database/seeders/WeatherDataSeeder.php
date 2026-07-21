@@ -18,14 +18,16 @@ class WeatherDataSeeder extends Seeder
                 ],
                 [
                     'temperature' => rand(20, 38),
-                    'rainfall'    => rand(0, 300),
+                    'rain'        => rand(0, 100),
                     'wind_speed'  => rand(5, 40),
+                    'humidity'    => rand(40, 90),
+                    'weathercode' => rand(0, 99),
                     'storm_risk'  => collect([
                         'Low',
                         'Medium',
                         'High'
                     ])->random(),
-                    'recorded_at' => now(),
+                    'description' => 'Sunny with scattered clouds',
                 ]
             );
 

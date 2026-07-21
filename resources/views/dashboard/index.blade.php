@@ -87,8 +87,8 @@
         <a class="nav-link" href="/exchange"><i class="fas fa-money-bill-wave"></i> Exchange</a>
         <a class="nav-link" href="/news"><i class="fas fa-newspaper"></i> News</a>
         <a class="nav-link" href="/ports"><i class="fas fa-anchor"></i> Ports</a>
+        <a class="nav-link" href="/ports/map"><i class="fas fa-map"></i> Port Map</a>
         <a class="nav-link" href="/risk"><i class="fas fa-exclamation-triangle"></i> Risk</a>
-        <a class="nav-link" href="/visualization"><i class="fas fa-chart-pie"></i> Visualization</a>
         <a class="nav-link" href="/route-simulation"><i class="fas fa-route"></i> Route Simulation</a>
         <a class="nav-link" href="/compare"><i class="fas fa-arrows-left-right"></i> Compare</a>
         <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Profile</a>

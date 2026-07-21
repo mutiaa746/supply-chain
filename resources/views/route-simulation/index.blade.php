@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-md-12">
         <h1 class="mb-4">🗺️ Route Simulation</h1>
-        <p class="text-muted">Simulasikan rute antar negara dan lihat risiko logistik</p>
+        <p class="text-muted">Simulasikan rute antar negara dengan moda transportasi</p>
     </div>
 </div>
 
@@ -14,6 +14,7 @@
     <div class="col-md-8 mx-auto">
         <div class="card">
             <div class="card-body">
+                {{-- PERBAIKAN: ganti route name --}}
                 <form method="POST" action="{{ route('route-simulation.calculate') }}">
                     @csrf
                     <div class="row">
@@ -43,7 +44,7 @@
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <label class="form-label fw-bold">🚗 Moda Transportasi</label>
-                            <div class="d-flex gap-3">
+                            <div class="d-flex gap-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="transport" value="plane" id="plane" checked>
                                     <label class="form-check-label" for="plane">✈️ Pesawat</label>

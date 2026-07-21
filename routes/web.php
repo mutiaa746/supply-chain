@@ -69,18 +69,18 @@ use App\Http\Controllers\VisualizationController;
     // ========== PORTS ==========
     Route::get('/ports', [PortController::class, 'index'])->name('ports');
     Route::get('/ports/fetch', [PortController::class, 'fetchPorts'])->name('ports.fetch');
+    Route::get('/ports/map', [\App\Http\Controllers\PortMapController::class, 'index'])->name('ports.map');
 
     // ========== RISK ==========
     Route::get('/risk', [RiskScoreController::class, 'index'])->name('risk');
 
-    // ========== ROUTE SIMULATION========== 
-    Route::get('/route-simulation', [App\Http\Controllers\RouteSimulationController::class, 'index'])->name('route-simulation');
-    Route::post('/route-simulation/calculate', [App\Http\Controllers\RouteSimulationController::class, 'calculate'])->name('route-simulation.calculate');
-  
     // ========== COMPARE ==========
     Route::get('/compare', [App\Http\Controllers\CompareController::class, 'index'])->name('compare');
     Route::get('/compare/result', [App\Http\Controllers\CompareController::class, 'result'])->name('compare.result');
   
+        // ========== ROUTE SIMULATION========== 
+    Route::get('/route-simulation', [RouteSimulationController::class, 'index'])->name('route-simulation');
+    Route::post('/route-simulation/calculate', [RouteSimulationController::class, 'calculate'])->name('route-simulation.calculate');
     // ========== WATCHLIST ==========
     Route::get('/watchlist', [\App\Http\Controllers\WatchlistController::class, 'index'])->name('watchlist');
     Route::post('/watchlist', [\App\Http\Controllers\WatchlistController::class, 'store'])->name('watchlist.store');
@@ -130,7 +130,6 @@ use App\Http\Controllers\VisualizationController;
     Route::put('/articles/{id}', [AdminController::class, 'articlesUpdate'])->name('admin.articles.update');
     Route::delete('/articles/{id}', [AdminController::class, 'articlesDelete'])->name('admin.articles.delete');
 });
-
 
     Route::get('/test/risk/all', function () {
         $service = new \App\Services\RiskScoreService(
@@ -194,3 +193,14 @@ use App\Http\Controllers\VisualizationController;
         $service = new \App\Services\CountryService();
         return response()->json($service->updateWorldBankData());
     });
+
+    Route::get('/test-route', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'Test route berhasil!',
+        'all_routes' => collect(Route::getRoutes())->map(function($route) {
+            return $route->uri();
+        })->toArray()
+    ]);
+});
+

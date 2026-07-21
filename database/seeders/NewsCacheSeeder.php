@@ -17,6 +17,7 @@ class NewsCacheSeeder extends Seeder
                     'country_id'=>$country->id,
                 ],
                 [
+                    'country_code'=>$country->country_code,
                     'title'=>'Supply Chain Update '.$country->country_name,
                     'source'=>'NewsAPI',
                     'url'=>'https://example.com/news/'.$country->country_code,

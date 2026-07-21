@@ -72,13 +72,11 @@
         <a class="nav-link {{ request()->routeIs('ports') ? 'active' : '' }}" href="{{ route('ports') }}">
             <i class="fas fa-anchor"></i> Ports
        </a>
+        <a class="nav-link {{ request()->routeIs('ports.map') ? 'active' : '' }}" href="{{ route('ports.map') }}">
+            <i class="fas fa-map"></i> Port Map
+        </a>
         <a class="nav-link {{ request()->routeIs('risk') ? 'active' : '' }}" href="{{ route('risk') }}">
             <i class="fas fa-exclamation-triangle"></i> Risk
-        </a>
-
-        <!-- ========== VISUALIZATION (TAMBAHKAN DI SINI) ========== -->
-        <a class="nav-link {{ request()->routeIs('visualization') ? 'active' : '' }}" href="{{ route('visualization') }}">
-            <i class="fas fa-chart-pie"></i> Visualization
         </a>
 
         <a class="nav-link {{ request()->routeIs('route-simulation') ? 'active' : '' }}" href="{{ route('route-simulation') }}">

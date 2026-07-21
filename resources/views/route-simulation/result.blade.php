@@ -5,10 +5,12 @@
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    #routeMap { height: 400px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
+    #routeMap { height: 500px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .result-card { background: #f8f9fa; border-radius: 10px; padding: 15px; text-align: center; }
     .result-card .value { font-size: 24px; font-weight: bold; }
     .result-card .label { color: #888; font-size: 14px; }
+    .ship-icon { font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .plane-icon { font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     .risk-high { color: #e74a3b; }
     .risk-medium { color: #f6c23e; }
     .risk-low { color: #1cc88a; }
@@ -31,7 +33,7 @@
         <div class="card text-center">
             <div class="card-body">
                 <h3>
-                    @if($country1->flag)<img src="{{ $country1->flag }}" width="30" height="20">@endif
+                    @if($country1->flag)<img src="{{ $country1->flag }}" width="30" height="20" class="me-2">@endif
                     {{ $country1->country_name }}
                 </h3>
                 <p class="text-muted">{{ $country1->capital ?? '' }}</p>
@@ -49,15 +51,16 @@
     </div>
     <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
         <div>
-            <div style="font-size: 40px;">{{ $transportIcon }}</div>
+            <div style="font-size: 50px;">{{ $transportIcon }}</div>
             <div class="text-muted">{{ $transportName }}</div>
+            <div class="text-muted small">({{ $distanceKm }} km)</div>
         </div>
     </div>
     <div class="col-md-5">
         <div class="card text-center">
             <div class="card-body">
                 <h3>
-                    @if($country2->flag)<img src="{{ $country2->flag }}" width="30" height="20">@endif
+                    @if($country2->flag)<img src="{{ $country2->flag }}" width="30" height="20" class="me-2">@endif
                     {{ $country2->country_name }}
                 </h3>
                 <p class="text-muted">{{ $country2->capital ?? '' }}</p>
@@ -79,8 +82,12 @@
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header"><h5 class="mb-0">🗺️ Rute Perjalanan</h5></div>
-            <div class="card-body"><div id="routeMap"></div></div>
+            <div class="card-header">
+                <h5 class="mb-0">🗺️ Rute {{ $transportName }} ({{ $transportIcon }})</h5>
+            </div>
+            <div class="card-body">
+                <div id="routeMap"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -90,7 +97,7 @@
     <div class="col-md-3"><div class="result-card"><div class="value">{{ number_format($distanceKm) }}</div><div class="label">Kilometer (km)</div></div></div>
     <div class="col-md-3"><div class="result-card"><div class="value">{{ number_format($distanceMiles) }}</div><div class="label">Miles (mi)</div></div></div>
     <div class="col-md-3"><div class="result-card"><div class="value">{{ number_format($distanceNautical) }}</div><div class="label">Nautical Miles (nm)</div></div></div>
-    <div class="col-md-3"><div class="result-card"><div class="value">{{ $timeText }}</div><div class="label">Estimasi Waktu</div></div></div>
+    <div class="col-md-3"><div class="result-card"><div class="value">{{ $timeText }}</div><div class="label">Estimasi Waktu {{ $transportName }}</div></div></div>
 </div>
 
 <!-- RISK MONITORING -->
@@ -177,34 +184,66 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var map = L.map('routeMap').setView([0, 0], 2);
+    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
     var route = @json($route ?? []);
     var routeCurved = @json($routeCurved ?? []);
+    var symbol = @json($symbol ?? 'plane');
 
+    // ========== ICON ==========
+    var startIcon = L.icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41]
+    });
+
+    var endIcon = L.icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41]
+    });
+
+    // ========== SIMBOL KAPAL / PESAWAT ==========
+    var transportIcon = L.divIcon({
+        html: `<div style="font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">${symbol === 'ship' ? '🚢' : '✈️'}</div>`,
+        className: 'transport-icon',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+
+    // ========== TAMBAHKAN MARKER ==========
     if (route.length >= 2) {
-        var startIcon = L.icon({
-            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41], iconAnchor: [12, 41]
-        });
-        var endIcon = L.icon({
-            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-            iconSize: [25, 41], iconAnchor: [12, 41]
-        });
+        L.marker(route[0], { icon: startIcon }).addTo(map)
+            .bindPopup('<strong>Start</strong><br>{{ $country1->country_name }}');
 
-        L.marker(route[0], { icon: startIcon }).addTo(map).bindPopup('<strong>Start</strong><br>{{ $country1->country_name }}');
-        L.marker(route[1], { icon: endIcon }).addTo(map).bindPopup('<strong>Destination</strong><br>{{ $country2->country_name }}');
+        L.marker(route[1], { icon: endIcon }).addTo(map)
+            .bindPopup('<strong>Destination</strong><br>{{ $country2->country_name }}');
 
+        // Simbol transport di tengah rute
+        var midPoint = [
+            (route[0][0] + route[1][0]) / 2,
+            (route[0][1] + route[1][1]) / 2
+        ];
+        L.marker(midPoint, { icon: transportIcon }).addTo(map)
+            .bindPopup('{{ $transportIcon }} {{ $transportName }}<br>Jarak: {{ number_format($distanceKm) }} km');
+
+        // Garis rute
         L.polyline(routeCurved, {
-            color: '#4e73df', weight: 4, opacity: 0.8, dashArray: '10, 10', smoothFactor: 1
+            color: symbol === 'ship' ? '#2980b9' : '#e74a3b',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '10, 10',
+            smoothFactor: 1
         }).addTo(map);
 
+        // Fit bounds
         var bounds = L.latLngBounds(route);
-        map.fitBounds(bounds, { padding: [50, 50] });
+        map.fitBounds(bounds, { padding: [80, 80] });
     }
 });
 </script>

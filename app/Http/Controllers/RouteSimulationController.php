@@ -33,7 +33,7 @@ class RouteSimulationController extends Controller
                 ->with('error', 'Salah satu negara tidak memiliki koordinat!');
         }
 
-        // ========== JARAK ==========
+        // ========== HITUNG JARAK ==========
         $distance = $this->calculateDistance(
             $country1->latitude, $country1->longitude,
             $country2->latitude, $country2->longitude
@@ -43,22 +43,24 @@ class RouteSimulationController extends Controller
         $distanceMiles = round($distance * 0.621371, 0);
         $distanceNautical = round($distance * 0.539957, 0);
 
-        // ========== WAKTU ==========
+        // ========== ESTIMASI WAKTU ==========
         $transport = $request->transport;
         if ($transport == 'plane') {
-            $speed = 800;
+            $speed = 800; // km/h
             $timeHours = round($distanceKm / $speed, 1);
             $timeDays = round($timeHours / 24, 1);
             $timeText = $timeHours . ' jam (' . $timeDays . ' hari)';
             $transportIcon = '✈️';
             $transportName = 'Pesawat';
+            $symbol = 'plane';
         } else {
-            $speed = 30;
+            $speed = 30; // km/h
             $timeHours = round($distanceKm / $speed, 1);
             $timeDays = round($timeHours / 24, 1);
             $timeText = $timeHours . ' jam (' . $timeDays . ' hari)';
             $transportIcon = '🚢';
             $transportName = 'Kapal';
+            $symbol = 'ship';
         }
 
         // ========== RISK MONITORING ==========
@@ -77,21 +79,22 @@ class RouteSimulationController extends Controller
         $newsRisk1 = $this->getNewsRisk($country1->country_code);
         $newsRisk2 = $this->getNewsRisk($country2->country_code);
 
-        $totalRisk1 = ($weatherRisk1 + $currency1 + $inflationRisk1 + $newsRisk1) / 4;
-        $totalRisk2 = ($weatherRisk2 + $currency2 + $inflationRisk2 + $newsRisk2) / 4;
+        $totalRisk1 = round(($weatherRisk1 + $currency1 + $inflationRisk1 + $newsRisk1) / 4, 1);
+        $totalRisk2 = round(($weatherRisk2 + $currency2 + $inflationRisk2 + $newsRisk2) / 4, 1);
 
         $riskLevel1 = $this->getRiskLevel($totalRisk1);
         $riskLevel2 = $this->getRiskLevel($totalRisk2);
 
-        // ========== PELABUHAN ==========
+        // ========== PELABUHAN TERDEKAT ==========
         $nearestPorts = $this->getNearestPorts($country1->latitude, $country1->longitude, 3);
 
-        // ========== RUTE ==========
+        // ========== ROUTE ==========
         $route = [
             [$country1->latitude, $country1->longitude],
             [$country2->latitude, $country2->longitude],
         ];
 
+        // Titik tengah untuk garis melengkung
         $midLat = ($country1->latitude + $country2->latitude) / 2;
         $midLng = ($country1->longitude + $country2->longitude) / 2;
         $offset = 5;
@@ -104,7 +107,7 @@ class RouteSimulationController extends Controller
         return view('route-simulation.result', compact(
             'country1', 'country2',
             'distanceKm', 'distanceMiles', 'distanceNautical',
-            'timeText', 'transport', 'transportIcon', 'transportName',
+            'timeText', 'transport', 'transportIcon', 'transportName', 'symbol',
             'weather1', 'weather2',
             'weatherRisk1', 'weatherRisk2',
             'currency1', 'currency2',
@@ -134,9 +137,10 @@ class RouteSimulationController extends Controller
     private function getWeatherRisk($weather)
     {
         if (!$weather) return 50;
-        $temp = $weather->temperature;
-        if ($temp > 35 || $weather->wind_speed > 50) return 80;
-        if ($temp > 30 || $weather->wind_speed > 30) return 50;
+        $temp = $weather->temperature ?? 0;
+        $wind = $weather->wind_speed ?? 0;
+        if ($temp > 35 || $wind > 50) return 80;
+        if ($temp > 30 || $wind > 30) return 50;
         return 20;
     }
 
