@@ -81,6 +81,7 @@ use App\Http\Controllers\VisualizationController;
         // ========== ROUTE SIMULATION========== 
     Route::get('/route-simulation', [RouteSimulationController::class, 'index'])->name('route-simulation');
     Route::post('/route-simulation/calculate', [RouteSimulationController::class, 'calculate'])->name('route-simulation.calculate');
+   
     // ========== WATCHLIST ==========
     Route::get('/watchlist', [\App\Http\Controllers\WatchlistController::class, 'index'])->name('watchlist');
     Route::post('/watchlist', [\App\Http\Controllers\WatchlistController::class, 'store'])->name('watchlist.store');
