@@ -1,4 +1,4 @@
-                                     Global Supply Chain Risk Monitoring System
+  Global Supply Chain Risk Monitoring System
 
 Global Supply Chain Risk Monitoring System merupakan aplikasi berbasis web yang dikembangkan menggunakan Laravel Framework untuk membantu perusahaan maupun pengguna dalam memantau berbagai faktor yang dapat memengaruhi stabilitas rantai pasok (Global Supply Chain). Sistem ini mengintegrasikan beberapa sumber data eksternal, seperti kondisi cuaca, indikator ekonomi, nilai tukar mata uang, dan berita internasional sebagai dasar dalam melakukan analisis tingkat risiko pada suatu negara.
 
