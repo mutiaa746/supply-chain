@@ -81,6 +81,7 @@
             <a href="/risk">Risk</a>
             <a href="/route-simulation">Route Simulation</a>
             <a href="/compare">Compare</a>
+            <a href="/watchlist">Watchlist</a>
             <a href="/profile">Profile</a>
             <form method="POST" action="/logout" style="display:inline;">
                 @csrf

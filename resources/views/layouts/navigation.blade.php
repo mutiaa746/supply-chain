@@ -35,6 +35,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('risk') }}">⚠️ Risk</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('watchlist') }}">⭐ Watchlist</a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 @auth

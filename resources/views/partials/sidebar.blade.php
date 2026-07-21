@@ -47,5 +47,14 @@
                 <i class="bi bi-route me-2"></i> Route Simulation
             </a>
         </li>
-    </ul>
+        <li class="nav-item">
+            <a href="/watchlist" class="nav-link text-white">
+                <i class="bi bi-star me-2"></i> Watchlist
+             </a>
+            <li class="nav-item">
+                <a href="{{ route('countries') }}" class="nav-link text-white">
+                    <i class="bi bi-globe me-2"></i> Countries
+                </a>
+            </li>            
+       </ul>
 </div>

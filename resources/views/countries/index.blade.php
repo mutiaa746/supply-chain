@@ -44,9 +44,23 @@
                                 <td>{{ $country->currency ?? '-' }}</td>
                                 <td>{{ number_format($country->population ?? 0) }}</td>
                                 <td>
-                                    <a href="{{ route('countries.show', $country->id) }}" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('countries.show', $country->id) }}" class="btn btn-primary btn-sm me-1">
                                         Detail
                                     </a>
+                                    @auth
+                                        @php
+                                            $isWatched = \App\Models\Watchlist::where('user_id', Auth::id())
+                                                ->where('country_id', $country->id)
+                                                ->exists();
+                                        @endphp
+                                        <form action="{{ route('watchlist.toggle') }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <input type="hidden" name="country_id" value="{{ $country->id }}">
+                                            <button type="submit" class="btn btn-sm {{ $isWatched ? 'btn-warning' : 'btn-outline-warning' }}" title="{{ $isWatched ? 'Hapus dari Watchlist' : 'Tambah ke Watchlist' }}">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </form>
+                                    @endauth
                                 </td>
                             </tr>
                             @endforeach

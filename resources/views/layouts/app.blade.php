@@ -85,6 +85,9 @@
         <a class="nav-link {{ request()->routeIs('compare') ? 'active' : '' }}" href="{{ route('compare') }}">
             <i class="fas fa-arrows-left-right"></i> Compare
         </a>
+        <a class="nav-link {{ request()->routeIs('watchlist*') ? 'active' : '' }}" href="{{ route('watchlist') }}">
+            <i class="fas fa-star"></i> Watchlist
+        </a>
 
         <!-- ADMIN -->
         @if(Auth::check() && Auth::user()->email == 'admin@example.com')

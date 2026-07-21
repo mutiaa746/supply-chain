@@ -79,6 +79,7 @@
         <a class="nav-link" href="/risk"><i class="fas fa-exclamation-triangle"></i> Risk</a>
         <a class="nav-link" href="/route-simulation"><i class="fas fa-route"></i> Route Simulation</a>
         <a class="nav-link" href="/compare"><i class="fas fa-arrows-left-right"></i> Compare</a>
+        <a class="nav-link" href="/watchlist"><i class="fas fa-star"></i> Watchlist</a>
         <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Profile</a>
         <form method="POST" action="/logout" style="margin:0;">
             @csrf
