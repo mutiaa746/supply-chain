@@ -5,7 +5,7 @@ Global Supply Chain Risk Monitoring System merupakan aplikasi berbasis web yang 
 Melalui aplikasi ini, pengguna dapat memperoleh informasi secara real-time mengenai kondisi yang berpotensi mengganggu proses distribusi barang, seperti cuaca ekstrem, perubahan ekonomi, fluktuasi nilai tukar mata uang, maupun peristiwa internasional. Seluruh informasi tersebut kemudian diolah menjadi Risk Score sehingga pengguna dapat mengevaluasi tingkat risiko setiap negara sebelum menentukan strategi distribusi.Selain menyediakan fitur monitoring, sistem juga dilengkapi dengan visualisasi data, simulasi rute distribusi, perbandingan antar negara, serta halaman administrator untuk mengelola data master yang digunakan oleh sistem.
 
  A. Fitur Utama
- 👤 Halaman User
+👤 Halaman User
 
 1. Login User
 Halaman autentikasi yang digunakan pengguna untuk masuk ke dalam sistem menggunakan email dan password. Setelah proses login berhasil, pengguna akan diarahkan menuju Dashboard untuk mengakses seluruh fitur monitoring sesuai hak akses yang dimiliki.
